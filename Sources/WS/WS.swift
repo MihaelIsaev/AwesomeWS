@@ -12,9 +12,29 @@ public struct WSError: WSErrorProtocol {
 
 // MARK: Engine
 
+private struct NextResponder: Responder {
+    typealias NextCallback = () throws -> ()
+    
+    let next: NextCallback
+    
+    init(next: @escaping NextCallback) {
+        self.next = next
+    }
+    
+    func respond(to req: Request) throws -> Future<Response> {
+        try next()
+        let resp = Response(http: HTTPResponse(status: .ok,
+                                                                    version: HTTPVersion.init(major: 1, minor: 1),
+                                                                    headers: HTTPHeaders(),
+                                                                    body: ""), using: req)
+        return req.eventLoop.newSucceededFuture(result: resp)
+    }
+}
+
 open class WS: Service, WebSocketServer {
     var server = NIOWebSocketServer.default()
     var clients: [WSClient] = []
+    var middlewares: [Middleware] = []
     //var acks: [UUID]
     
     public struct NotificationMessage: Codable {
@@ -31,15 +51,27 @@ open class WS: Service, WebSocketServer {
     
     // MARK: Initialization
     
-    public init(at path: [PathComponent], handler: WSHTTPConnectionFutureHandler? = nil) {
+    public init(at path: [PathComponent], protectedBy middlewares: [Middleware]) {
         server.get(at: path) { (ws, req) in
             do {
-                if let handler = handler {
-                    _ = try handler(req).map {
-                        try self.onConnection(ws, req)
-                    }
-                } else {
+                let success: () throws -> Void = {
                     try self.onConnection(ws, req)
+                }
+                var middlewares = middlewares
+                if middlewares.count == 0 {
+                    try success()
+                } else {
+                    var iterate: () throws -> Void = {}
+                    iterate = {
+                        if let middleware = middlewares.first {
+                            middlewares.removeFirst()
+                            let nextResponder = NextResponder(next: iterate)
+                            _ = try middleware.respond(to: req, chainingTo: nextResponder)
+                        } else {
+                            try success()
+                        }
+                    }
+                    try iterate()
                 }
             } catch {
                 ws.close(code: .policyViolation)
@@ -47,27 +79,12 @@ open class WS: Service, WebSocketServer {
         }
     }
     
-    convenience init(at path: [PathComponent], handler: @escaping WSHTTPConnectionHandler) {
-        self.init(at: path) { req -> Future<Void> in
-            try handler(req)
-            return req.eventLoop.newSucceededFuture(result: ())
-        }
+    public convenience init(at path: PathComponent..., protectedBy middlewares: [Middleware]) {
+        self.init(at: path, protectedBy: middlewares)
     }
     
-    public convenience init(at path: PathComponent..., handler: @escaping WSHTTPConnectionHandler) {
-        self.init(at: path, handler: handler)
-    }
-    
-    public convenience init(at path: PathComponentsRepresentable..., handler: @escaping WSHTTPConnectionHandler) {
-        self.init(at: path.convertToPathComponents(), handler: handler)
-    }
-    
-    public convenience init(at path: PathComponent..., handler: WSHTTPConnectionFutureHandler? = nil) {
-        self.init(at: path, handler: handler)
-    }
-    
-    public convenience init(at path: PathComponentsRepresentable..., handler: WSHTTPConnectionFutureHandler? = nil) {
-        self.init(at: path.convertToPathComponents(), handler: handler)
+    public convenience init(at path: PathComponentsRepresentable..., protectedBy middlewares: [Middleware]) {
+        self.init(at: path.convertToPathComponents(), protectedBy: middlewares)
     }
     
     //MARK: Text
