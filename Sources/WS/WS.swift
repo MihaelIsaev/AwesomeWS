@@ -31,7 +31,7 @@ open class WS: Service, WebSocketServer {
     
     // MARK: Initialization
     
-    public init(path: [PathComponent], handler: WSHTTPConnectionFutureHandler? = nil) {
+    public init(at path: [PathComponent], handler: WSHTTPConnectionFutureHandler? = nil) {
         server.get(at: path) { (ws, req) in
             do {
                 if let handler = handler {
@@ -47,27 +47,27 @@ open class WS: Service, WebSocketServer {
         }
     }
     
-    convenience init(path: [PathComponent], handler: WSHTTPConnectionHandler? = nil) {
-        self.init(path: path) { req -> Future<Void> in
-            try handler?(req)
+    convenience init(at path: [PathComponent], handler: @escaping WSHTTPConnectionHandler) {
+        self.init(at: path) { req -> Future<Void> in
+            try handler(req)
             return req.eventLoop.newSucceededFuture(result: ())
         }
     }
     
-    public convenience init(path: PathComponent..., handler: WSHTTPConnectionHandler? = nil) {
-        self.init(path: path, handler: handler)
+    public convenience init(at path: PathComponent..., handler: @escaping WSHTTPConnectionHandler) {
+        self.init(at: path, handler: handler)
     }
     
-    public convenience init(path: PathComponentsRepresentable..., handler: WSHTTPConnectionHandler? = nil) {
-        self.init(path: path.convertToPathComponents(), handler: handler)
+    public convenience init(at path: PathComponentsRepresentable..., handler: @escaping WSHTTPConnectionHandler) {
+        self.init(at: path.convertToPathComponents(), handler: handler)
     }
     
-    public convenience init(path: PathComponent..., handler: WSHTTPConnectionFutureHandler? = nil) {
-        self.init(path: path, handler: handler)
+    public convenience init(at path: PathComponent..., handler: WSHTTPConnectionFutureHandler? = nil) {
+        self.init(at: path, handler: handler)
     }
     
-    public convenience init(path: PathComponentsRepresentable..., handler: WSHTTPConnectionFutureHandler? = nil) {
-        self.init(path: path.convertToPathComponents(), handler: handler)
+    public convenience init(at path: PathComponentsRepresentable..., handler: WSHTTPConnectionFutureHandler? = nil) {
+        self.init(at: path.convertToPathComponents(), handler: handler)
     }
     
     //MARK: Text
