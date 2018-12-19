@@ -51,39 +51,22 @@ open class WS: Service, WebSocketServer {
     
     // MARK: Initialization
     
-    public init(at path: [PathComponent], protectedBy middlewares: [Middleware]) {
+    public init(at path: [PathComponent], protectedBy middlewares: [Middleware]? = nil) {
+        self.middlewares = middlewares ?? []
         server.get(at: path) { (ws, req) in
             do {
-                let success: () throws -> Void = {
-                    try self.onConnection(ws, req)
-                }
-                var middlewares = middlewares
-                if middlewares.count == 0 {
-                    try success()
-                } else {
-                    var iterate: () throws -> Void = {}
-                    iterate = {
-                        if let middleware = middlewares.first {
-                            middlewares.removeFirst()
-                            let nextResponder = NextResponder(next: iterate)
-                            _ = try middleware.respond(to: req, chainingTo: nextResponder)
-                        } else {
-                            try success()
-                        }
-                    }
-                    try iterate()
-                }
+                try self.onConnection(ws, req)
             } catch {
                 ws.close(code: .policyViolation)
             }
         }
     }
     
-    public convenience init(at path: PathComponent..., protectedBy middlewares: [Middleware]) {
+    public convenience init(at path: PathComponent..., protectedBy middlewares: [Middleware]? = nil) {
         self.init(at: path, protectedBy: middlewares)
     }
     
-    public convenience init(at path: PathComponentsRepresentable..., protectedBy middlewares: [Middleware]) {
+    public convenience init(at path: PathComponentsRepresentable..., protectedBy middlewares: [Middleware]? = nil) {
         self.init(at: path.convertToPathComponents(), protectedBy: middlewares)
     }
     
@@ -132,14 +115,37 @@ open class WS: Service, WebSocketServer {
     public func broadcast(_ clients: [WSClient], _ binary: Data) throws {
         clients.forEach { $0.connection.send(binary) }
     }
-    
+}
     //MARK: - WebSocketServer
-    
+
+extension WS {
     public func webSocketShouldUpgrade(for request: Request) -> HTTPHeaders? {
         return server.webSocketShouldUpgrade(for: request)
     }
     
     public func webSocketOnUpgrade(_ webSocket: WebSocket, for request: Request) {
-        server.webSocketOnUpgrade(webSocket, for: request)
+        let success: () throws -> Void = {
+            self.server.webSocketOnUpgrade(webSocket, for: request)
+        }
+        do {
+            var middlewares = self.middlewares
+            if middlewares.count == 0 {
+                try success()
+            } else {
+                var iterate: () throws -> Void = {}
+                iterate = {
+                    if let middleware = middlewares.first {
+                        middlewares.removeFirst()
+                        let nextResponder = NextResponder(next: iterate)
+                        _ = try middleware.respond(to: request, chainingTo: nextResponder)
+                    } else {
+                        try success()
+                    }
+                }
+                try iterate()
+            }
+        } catch {
+            webSocket.close(code: .policyViolation)
+        }
     }
 }
