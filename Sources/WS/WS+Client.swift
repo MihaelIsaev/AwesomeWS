@@ -3,20 +3,14 @@ import WebSocket
 import Vapor
 
 extension WS {
-    public func onConnection(_ ws: WebSocket, _ req: Request) throws {
-        let client = WSClient(ws, req)
-        clients.append(client)
-        ws.onText { ws, text in self.onText(client, text) }
-        ws.onBinary { ws, data in self.onBinary(client, data) }
-        ws.onClose.always { self.onClose(client) }
-        ws.onError { ws, error in self.onError(client, error) }
-    }
+    
     
     private func onText(_ client: WSClient, _ text: String) {
-        
+        //self.onText?(client, text)
     }
     
     private func onBinary(_ client: WSClient, _ data: Data) {
+        //self.onBinary?(client, data)
 //        do {
 //            let message = try JSONDecoder().decode(DataMessage.self, from: data)
 //            switch message.type {
@@ -38,6 +32,7 @@ extension WS {
     }
     
     private func onClose(_ client: WSClient) {
+        //self.onClose?(client)
         //if let index = self.clients.index(where: { c -> Bool in
         //    return c === client
         //}) {
@@ -51,6 +46,7 @@ extension WS {
     }
     
     private func onError(_ client: WSClient, _ error: Error) {
+        //self.onError?(client, error)
         debugPrint("[WS] onError: \(error)")
     }
 }

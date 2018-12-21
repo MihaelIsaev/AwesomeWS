@@ -2,72 +2,107 @@ import Vapor
 import WebSocket
 import Foundation
 
-protocol WSErrorProtocol: Error {}
-public struct WSError: WSErrorProtocol {
-    public var reason: String
-    init(reason: String) {
-        self.reason = reason
-    }
-}
-
-// MARK: Engine
-
-private struct NextResponder: Responder {
-    typealias NextCallback = () throws -> ()
-    
-    let next: NextCallback
-    
-    init(next: @escaping NextCallback) {
-        self.next = next
-    }
-    
-    func respond(to req: Request) throws -> Future<Response> {
-        try next()
-        let resp = Response(http: HTTPResponse(status: .ok,
-                                                                    version: HTTPVersion.init(major: 1, minor: 1),
-                                                                    headers: HTTPHeaders(),
-                                                                    body: ""), using: req)
-        return req.eventLoop.newSucceededFuture(result: resp)
-    }
-}
-
 open class WS: Service, WebSocketServer {
     var server = NIOWebSocketServer.default()
     var clients: [WSClient] = []
     var middlewares: [Middleware] = []
-    //var acks: [UUID]
-    
-    public struct NotificationMessage: Codable {
-        var type: String
-        var data: Data?
-        public init<T: RawRepresentable>(_ type: T, data: Data? = nil) where T.RawValue == String {
-            self.type = type.rawValue
-            self.data = data
-        }
-    }
-    
-    public typealias WSHTTPConnectionHandler = (Request) throws -> Void
-    public typealias WSHTTPConnectionFutureHandler = (Request) throws -> Future<Void>
     
     // MARK: Initialization
     
-    public init(at path: [PathComponent], protectedBy middlewares: [Middleware]? = nil) {
+    public init(at path: [PathComponent], protectedBy middlewares: [Middleware]? = nil, listener: WSListenable? = nil) {
         self.middlewares = middlewares ?? []
-        server.get(at: path) { (ws, req) in
-            do {
-                try self.onConnection(ws, req)
-            } catch {
-                ws.close(code: .policyViolation)
-            }
+        server.get(at: path, use: handleConnection)
+    }
+    
+    public convenience init(at path: PathComponent..., protectedBy middlewares: [Middleware]? = nil, listener: WSListenable? = nil) {
+        self.init(at: path, protectedBy: middlewares, listener: listener)
+    }
+    
+    public convenience init(at path: PathComponentsRepresentable..., protectedBy middlewares: [Middleware]? = nil, listener: WSListenable? = nil) {
+        self.init(at: path.convertToPathComponents(), protectedBy: middlewares, listener: listener)
+    }
+    
+    //MARK: Connection Handler
+    
+    public func handleConnection(_ ws: WebSocket, _ req: Request) {
+        let client = WSClient(ws, req)
+        clients.append(client)
+        onOpen?(client)
+        ws.onText { [weak self] ws, text in
+            self?.onTextHandler(client, text)
+        }
+        ws.onBinary { [weak self] ws, data in
+            self?.onBinaryHandler(client, data)
+        }
+        ws.onClose.always {
+            self.onCloseHandler()
+        }
+        ws.onError { [weak self] ws, error in
+            self?.onErrorHandler(client, error)
         }
     }
     
-    public convenience init(at path: PathComponent..., protectedBy middlewares: [Middleware]? = nil) {
-        self.init(at: path, protectedBy: middlewares)
+    public typealias OnOpenHandler = (WSClient) -> Void
+    public var onOpen: OnOpenHandler?
+    
+    public typealias OnTextHandler = (WSClient, String) -> Void
+    public var onText: OnTextHandler?
+    
+    private func onTextHandler(_ client: WSClient, _ text: String) {
+        onText?(client, text)
+        //self.onText?(client, text)
     }
     
-    public convenience init(at path: PathComponentsRepresentable..., protectedBy middlewares: [Middleware]? = nil) {
-        self.init(at: path.convertToPathComponents(), protectedBy: middlewares)
+    public typealias OnBinaryHandler = (WSClient, Data) -> Void
+    public var onBinary: OnBinaryHandler?
+    
+    private func onBinaryHandler(_ client: WSClient, _ data: Data) {
+        onBinary?(client, data)
+//        do {
+//            let message = try JSONDecoder().decode(DataMessage.self, from: data)
+//            switch message.type {
+//            case .subscribe:
+//                if let data = message.data,
+//                    let subscription = try? JSONDecoder().decode(SubscriptionData.self, from: data) {
+//                    subscribe(client, subscription)
+//                }
+//            case .unsubscribe:
+//                if let data = message.data,
+//                    let subscription = try? JSONDecoder().decode(SubscriptionData.self, from: data) {
+//                    unsubscribe(client, subscription)
+//                }
+//            default: break
+//            }
+//        } catch {
+//            debugPrint("[WS] onData: can't decode: \(error)")
+//        }
+    }
+    
+    public typealias OnCloseHandler = () -> Void
+    public var onClose: OnCloseHandler?
+    
+    private func onCloseHandler() {
+        onClose?()
+        //self.onClose?(client)
+        //if let index = self.clients.index(where: { c -> Bool in
+        //    return c === client
+        //}) {
+        //    self.clients.remove(at: index)
+        //}
+        //            DispatchQueue.global().async {
+        //                sleep(2)
+        //                print("[WS] onClose after 2 seconds: isClosed=\(ws.isClosed)")
+        //                ws.send("check sending on closed ws")
+        //            }
+    }
+    
+    public typealias OnErrorHandler = (WSClient, Error) -> Void
+    public var onError: OnErrorHandler?
+    
+    private func onErrorHandler(_ client: WSClient, _ error: Error) {
+        onError?(client, error)
+        //self.onError?(client, error)
+        debugPrint("[WS] onError: \(error)")
     }
     
     //MARK: Text
@@ -77,7 +112,7 @@ open class WS: Service, WebSocketServer {
     }
     
     public func broadcast(room: String, _ text: String) throws {
-        try broadcast(clients.filter { $0.rooms.contains(room) }, text)
+        try broadcast(clients.filter { $0.channels.contains(room) }, text)
     }
     
     public func broadcast(_ clients: [WSClient], _ text: String) throws {
@@ -91,7 +126,7 @@ open class WS: Service, WebSocketServer {
     }
     
     public func broadcast<T: Codable>(room: String, _ jsonPayload: T) throws {
-        try broadcast(clients.filter { $0.rooms.contains(room) }, jsonPayload)
+        try broadcast(clients.filter { $0.channels.contains(room) }, jsonPayload)
     }
     
     public func broadcast<T: Codable>(_ clients: [WSClient], _ jsonPayload: T) throws {
@@ -109,43 +144,10 @@ open class WS: Service, WebSocketServer {
     }
     
     public func broadcast(room: String, _ binary: Data) throws {
-        try broadcast(clients.filter { $0.rooms.contains(room) }, binary)
+        try broadcast(clients.filter { $0.channels.contains(room) }, binary)
     }
     
     public func broadcast(_ clients: [WSClient], _ binary: Data) throws {
         clients.forEach { $0.connection.send(binary) }
-    }
-}
-    //MARK: - WebSocketServer
-
-extension WS {
-    public func webSocketShouldUpgrade(for request: Request) -> HTTPHeaders? {
-        return server.webSocketShouldUpgrade(for: request)
-    }
-    
-    public func webSocketOnUpgrade(_ webSocket: WebSocket, for request: Request) {
-        let success: () throws -> Void = {
-            self.server.webSocketOnUpgrade(webSocket, for: request)
-        }
-        do {
-            var middlewares = self.middlewares
-            if middlewares.count == 0 {
-                try success()
-            } else {
-                var iterate: () throws -> Void = {}
-                iterate = {
-                    if let middleware = middlewares.first {
-                        middlewares.removeFirst()
-                        let nextResponder = NextResponder(next: iterate)
-                        _ = try middleware.respond(to: request, chainingTo: nextResponder)
-                    } else {
-                        try success()
-                    }
-                }
-                try iterate()
-            }
-        } catch {
-            webSocket.close(code: .policyViolation)
-        }
     }
 }
