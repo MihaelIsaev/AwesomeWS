@@ -8,50 +8,44 @@
 import Foundation
 import Vapor
 
-extension WS {
-    public func broadcast(on: Worker, _ clients: Set<WSClient>, _ text: String) throws -> Future<Void> {
-        return clients.map { $0.emit(text) }.flatten(on: on)
+extension WS: WSBroadcastable {
+    public func broadcast(on container: Container, to clients: Set<WSClient>, _ text: String) throws -> Future<Void> {
+        return clients.map { $0.emit(text) }.flatten(on: container)
     }
     
-    public func broadcast(on: Worker, _ clients: Set<WSClient>, _ binary: Data) throws -> Future<Void> {
-        return clients.map { $0.emit(binary) }.flatten(on: on)
+    public func broadcast(on container: Container, to clients: Set<WSClient>, _ binary: Data) throws -> Future<Void> {
+        return clients.map { $0.emit(binary) }.flatten(on: container)
     }
     
-    func broadcast<T: Codable>(on: Worker, _ clients: Set<WSClient>, _ event: WSOutgoingEvent<T>) throws -> Future<Void> {
+    func broadcast<T: Codable>(on container: Container, to clients: Set<WSClient>, _ event: WSOutgoingEvent<T>) throws -> Future<Void> {
         let jsonData = try JSONEncoder().encode(event)
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             throw WSError(reason: "Unable to preapare JSON string for broadcast message")
         }
-        return clients.map { $0.emit(jsonString) }.flatten(on: on)
+        return clients.map { $0.emit(jsonString) }.flatten(on: container)
     }
     
-    //MARK: Text
-    
-    public func broadcast(on: Worker, _ text: String) throws -> Future<Void> {
-        return try broadcast(on: on, clients, text)
+    public func broadcast(on container: Container, _ text: String) throws -> Future<Void> {
+        return try broadcast(on: container, to: clients, text)
     }
     
-    public func broadcast(on: Worker, to channel: String, _ text: String) throws -> Future<Void> {
-        return try broadcast(on: on, clients.filter { $0.channels.contains(channel) }, text)
+    public func broadcast(on container: Container, to channel: String, _ text: String) throws -> Future<Void> {
+        return try broadcast(on: container, to: clients.filter { $0.channels.contains(channel) }, text)
     }
     
-    //MARK: Binary
-    
-    public func broadcast(on: Worker, _ binary: Data) throws -> Future<Void> {
-        return try broadcast(on: on, clients, binary)
+    public func broadcast(on container: Container, _ binary: Data) throws -> Future<Void> {
+        return try broadcast(on: container, to: clients, binary)
     }
     
-    public func broadcast(on: Worker, to channel: String, _ binary: Data) throws -> Future<Void> {
-        return try broadcast(on: on, clients.filter { $0.channels.contains(channel) }, binary)
+    public func broadcast(on container: Container, to channel: String, _ binary: Data) throws -> Future<Void> {
+        return try broadcast(on: container, to: clients.filter { $0.channels.contains(channel) }, binary)
     }
     
-    //MARK: JSON
-    
-    public func broadcast<T: Codable>(on: Worker, _ event: WSEventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
-        return try broadcast(on: on, clients, WSOutgoingEvent(event.uid, payload: payload))
+    public func broadcast<T>(on container: Container, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void> where T : Decodable, T : Encodable {
+        return try broadcast(on: container, to: clients, WSOutgoingEvent(event.uid, payload: payload))
     }
     
-    public func broadcast<T: Codable>(on: Worker, to channel: String, _ event: WSEventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
-        return try broadcast(on: on, clients.filter { $0.channels.contains(channel) }, WSOutgoingEvent(event.uid, payload: payload))
+    public func broadcast<T>(on container: Container, to channel: String, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void> where T : Decodable, T : Encodable {
+        return try broadcast(on: container, to: clients.filter { $0.channels.contains(channel) }, WSOutgoingEvent(event.uid, payload: payload))
     }
 }

@@ -8,27 +8,27 @@
 import Foundation
 import Vapor
 
-public protocol WSBroadcastable {
+public protocol WSBroadcastable: class {
     @discardableResult
-    func broadcast(on: Worker, _ clients: Set<WSClient>, _ text: String) throws -> Future<Void>
+    func broadcast(on container: Container, to clients: Set<WSClient>, _ text: String) throws -> Future<Void>
     @discardableResult
-    func broadcast(on: Worker, _ clients: Set<WSClient>, _ binary: Data) throws -> Future<Void>
+    func broadcast(on container: Container, to clients: Set<WSClient>, _ binary: Data) throws -> Future<Void>
     
     //MARK: Text
     @discardableResult
-    func broadcast(on: Worker, _ text: String) throws -> Future<Void>
+    func broadcast(on container: Container, _ text: String) throws -> Future<Void>
     @discardableResult
-    func broadcast(on: Worker, to channel: String, _ text: String) throws -> Future<Void>
+    func broadcast(on container: Container, to channel: String, _ text: String) throws -> Future<Void>
     
     //MARK: Binary
     @discardableResult
-    func broadcast(on: Worker, _ binary: Data) throws -> Future<Void>
+    func broadcast(on container: Container, _ binary: Data) throws -> Future<Void>
     @discardableResult
-    func broadcast(on: Worker, to channel: String, _ binary: Data) throws -> Future<Void>
+    func broadcast(on container: Container, to channel: String, _ binary: Data) throws -> Future<Void>
     
     //MARK: Codable
     @discardableResult
-    func broadcast<T: Codable>(on: Worker, _ event: WSEventIdentifier<T>, payload: T?) throws -> Future<Void>
+    func broadcast<T: Codable>(on container: Container, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void>
     @discardableResult
-    func broadcast<T: Codable>(on: Worker, to channel: String, _ event: WSEventIdentifier<T>, payload: T?) throws -> Future<Void>
+    func broadcast<T: Codable>(on container: Container, to channel: String, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void>
 }

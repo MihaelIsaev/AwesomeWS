@@ -44,7 +44,7 @@ open class WS: Service, WebSocketServer {
     //MARK: Connection Handler
     
     func handleConnection(_ ws: WebSocket, _ req: Request) {
-        let client = WSClient(ws, req, logger: self)
+        let client = WSClient(ws, req, ws: self)
         delegate?.wsOnOpen(self, client)
         logger.log(.info("onOpen"), .debug("onOpen cid: " + client.cid.uuidString))
         ws.onText { [weak self] ws, text in
