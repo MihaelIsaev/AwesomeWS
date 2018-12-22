@@ -28,7 +28,7 @@ public protocol WSBroadcastable {
     
     //MARK: Codable
     @discardableResult
-    func broadcast<T: Codable>(on: Worker, _ event: EventIdentifier<T>, payload: T?) throws -> Future<Void>
+    func broadcast<T: Codable>(on: Worker, _ event: WSEventIdentifier<T>, payload: T?) throws -> Future<Void>
     @discardableResult
-    func broadcast<T: Codable>(on: Worker, to channel: String, _ event: EventIdentifier<T>, payload: T?) throws -> Future<Void>
+    func broadcast<T: Codable>(on: Worker, to channel: String, _ event: WSEventIdentifier<T>, payload: T?) throws -> Future<Void>
 }

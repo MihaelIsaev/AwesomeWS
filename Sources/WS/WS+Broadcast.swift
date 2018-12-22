@@ -17,7 +17,7 @@ extension WS {
         return clients.map { $0.emit(binary) }.flatten(on: on)
     }
     
-    func broadcast<T: Codable>(on: Worker, _ clients: Set<WSClient>, _ event: OutgoingEvent<T>) throws -> Future<Void> {
+    func broadcast<T: Codable>(on: Worker, _ clients: Set<WSClient>, _ event: WSOutgoingEvent<T>) throws -> Future<Void> {
         let jsonData = try JSONEncoder().encode(event)
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             throw WSError(reason: "Unable to preapare JSON string for broadcast message")
@@ -47,11 +47,11 @@ extension WS {
     
     //MARK: JSON
     
-    public func broadcast<T: Codable>(on: Worker, _ event: EventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
-        return try broadcast(on: on, clients, OutgoingEvent(event.uid, payload: payload))
+    public func broadcast<T: Codable>(on: Worker, _ event: WSEventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
+        return try broadcast(on: on, clients, WSOutgoingEvent(event.uid, payload: payload))
     }
     
-    public func broadcast<T: Codable>(on: Worker, to channel: String, _ event: EventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
-        return try broadcast(on: on, clients.filter { $0.channels.contains(channel) }, OutgoingEvent(event.uid, payload: payload))
+    public func broadcast<T: Codable>(on: Worker, to channel: String, _ event: WSEventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
+        return try broadcast(on: on, clients.filter { $0.channels.contains(channel) }, WSOutgoingEvent(event.uid, payload: payload))
     }
 }

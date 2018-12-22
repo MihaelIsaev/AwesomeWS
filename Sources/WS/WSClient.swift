@@ -10,9 +10,9 @@ public class WSClient {
     public let eventLoop: EventLoop
     public var channels = Set<String>()
     
-    weak var logger: Loggable?
+    weak var logger: WSLoggable?
     
-    init (_ connection: WebSocket, _ req: Request, logger: Loggable) {
+    init (_ connection: WebSocket, _ req: Request, logger: WSLoggable) {
         self.connection = connection
         self.req = req
         self.eventLoop = req.eventLoop
@@ -73,7 +73,7 @@ extension WSClient {
     
     /// Sends Codable model encoded to JSON string
     @discardableResult
-    public func emit<T: Codable>(asText event: EventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
+    public func emit<T: Codable>(asText event: WSEventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
         let jsonData = try JSONEncoder().encode(event)
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             logger?.log(.error("Unable to preapare JSON string emit"))
@@ -84,7 +84,7 @@ extension WSClient {
     
     /// Sends Codable model encoded to JSON binary
     @discardableResult
-    public func emit<T: Codable>(asBinary event: EventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
+    public func emit<T: Codable>(asBinary event: WSEventIdentifier<T>, payload: T? = nil) throws -> Future<Void> {
         return emit(try JSONEncoder().encode(event))
     }
 }

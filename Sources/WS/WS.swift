@@ -7,11 +7,11 @@ open class WS: Service, WebSocketServer {
     var middlewares: [Middleware] = []
     
     var clients = Set<WSClient>()
-    var channels = Set<Channel>()
+    var channels = Set<WSChannel>()
     
     var delegate: WSDelegate?
     
-    public var logger = Logger(.off)
+    public var logger = WSLogger(.off)
     
     // MARK: Initialization
     
@@ -69,8 +69,8 @@ open class WS: Service, WebSocketServer {
     }
 }
 
-extension WS: Loggable {
-    func log(_ message: Logger.Message...) {
+extension WS: WSLoggable {
+    func log(_ message: WSLogger.Message...) {
         logger.log(message)
     }
 }

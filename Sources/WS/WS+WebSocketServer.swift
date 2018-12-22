@@ -19,7 +19,7 @@ extension WS {
                 iterate = {
                     if let middleware = middlewares.first {
                         middlewares.removeFirst()
-                        let nextResponder = NextResponder(next: iterate)
+                        let nextResponder = WSNextResponder(next: iterate)
                         _ = try middleware.respond(to: request, chainingTo: nextResponder)
                     } else {
                         try success()

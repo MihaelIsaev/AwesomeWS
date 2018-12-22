@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class Channel {
+public class WSChannel {
     public let uid: String
     public var clients: [WSClient] = []
     init(_ uid: String) {
@@ -15,12 +15,12 @@ public class Channel {
     }
 }
 
-extension Channel: Hashable {
+extension WSChannel: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(uid)
     }
     
-    public static func == (lhs: Channel, rhs: Channel) -> Bool {
+    public static func == (lhs: WSChannel, rhs: WSChannel) -> Bool {
         return lhs.uid == rhs.uid
     }
 }

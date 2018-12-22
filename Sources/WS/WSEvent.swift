@@ -9,7 +9,7 @@ import Foundation
 
 public struct NoPayload: Codable {}
 
-public struct Event<P: Codable>: Codable {
+public struct WSEvent<P: Codable>: Codable {
     public let event: String
     public let payload: P?
     public init (event: String, payload: P? = nil) {
@@ -18,18 +18,18 @@ public struct Event<P: Codable>: Codable {
     }
 }
 
-public protocol EventProtocol: Codable {
+public protocol WSEventProtocol: Codable {
     associatedtype P: Codable
     
-    var event: EventIdentifier<P> { get }
+    var event: WSEventIdentifier<P> { get }
     var payload: P? { get }
 }
 
-public struct EventPrototype: Codable {
+public struct WSEventPrototype: Codable {
     public var event: String
 }
 
-public struct OutgoingEvent<P: Codable>: Codable {
+public struct WSOutgoingEvent<P: Codable>: Codable {
     var event: String
     var payload: P?
     init(_ event: String, payload: P?) {

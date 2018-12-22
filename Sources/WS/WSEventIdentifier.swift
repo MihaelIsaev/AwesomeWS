@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct EventIdentifier<P: Codable>: Equatable, Hashable, CustomStringConvertible, ExpressibleByStringLiteral, Codable {
+public struct WSEventIdentifier<P: Codable>: Equatable, Hashable, CustomStringConvertible, ExpressibleByStringLiteral, Codable {
     /// The unique id.
     public let uid: String
     
@@ -37,7 +37,7 @@ public struct LeavePayload: Codable {
     public var channel: UUID
 }
 
-extension EventIdentifier {
-    public static var join: EventIdentifier<JoinPayload> { return .init("join") }
-    public static var leave: EventIdentifier<LeavePayload> { return .init("leave") }
+extension WSEventIdentifier {
+    public static var join: WSEventIdentifier<JoinPayload> { return .init("join") }
+    public static var leave: WSEventIdentifier<LeavePayload> { return .init("leave") }
 }

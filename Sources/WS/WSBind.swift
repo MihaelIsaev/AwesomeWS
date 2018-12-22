@@ -12,10 +12,10 @@ open class WSBind: WSObserver {
     
     var binds: [String: BindHandler] = [:]
     
-    public func bind<P: Codable>(_ identifier: EventIdentifier<P>, _ handler: @escaping (WSClient, P?) -> Void) {
+    public func bind<P: Codable>(_ identifier: WSEventIdentifier<P>, _ handler: @escaping (WSClient, P?) -> Void) {
         binds[identifier.uid] = { client, data in
             do {
-                let res = try JSONDecoder().decode(Event<P>.self, from: data)
+                let res = try JSONDecoder().decode(WSEvent<P>.self, from: data)
                 handler(client, res.payload)
             } catch {
                 print(error)
@@ -53,7 +53,7 @@ open class WSBind: WSObserver {
     
     func proceedData(_ ws: WS, _ client: WSClient, data: Data) {
         do {
-            let prototype = try JSONDecoder().decode(EventPrototype.self, from: data)
+            let prototype = try JSONDecoder().decode(WSEventPrototype.self, from: data)
             switch prototype.event {
             case "join": ws.joining(client, data: data)
             case "leave": ws.leaving(client, data: data)

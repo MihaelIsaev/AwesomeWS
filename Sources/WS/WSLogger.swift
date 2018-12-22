@@ -7,12 +7,12 @@
 
 import Foundation
 
-public protocol LoggerDelegate: class {
-    func onAny(_ level: Logger.Level, _ message: String)
+public protocol WSLoggerDelegate: class {
+    func onAny(_ level: WSLogger.Level, _ message: String)
     func onCurrentLevel(_ message: String)
 }
 
-public struct Logger {
+public struct WSLogger {
     public enum Level: Int {
         ///Don't log anything at all.
         case off
@@ -75,7 +75,7 @@ public struct Logger {
     }
     
     public var level: Level
-    public weak var delegate: LoggerDelegate?
+    public weak var delegate: WSLoggerDelegate?
     
     public init (_ level: Level) {
         self.level = level

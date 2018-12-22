@@ -1,7 +1,7 @@
 import Foundation
 import Vapor
 
-struct NextResponder: Responder {
+struct WSNextResponder: Responder {
     typealias NextCallback = () throws -> ()
     
     let next: NextCallback
