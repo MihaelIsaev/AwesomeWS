@@ -9,7 +9,7 @@ extension WS {
         if let client = clientsCache[token] {
             return client
         }
-        guard let client = clients.first(where: { $0.req.http.headers[.authorization].first == token }) else {
+        guard let client = clients.first(where: { $0.http.headers[.authorization].first == token }) else {
             throw WSError(reason: "Unable to find websocket client with Authorization token from Request")
         }
         clientsCache[token] = client
