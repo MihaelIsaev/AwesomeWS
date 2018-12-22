@@ -49,9 +49,9 @@ public struct Logger {
         var level: Level {
             switch self {
             case .off: return .off
-            case .error(let v): return .error
-            case .info(let v): return .info
-            case .debug(let v): return .debug
+            case .error: return .error
+            case .info: return .info
+            case .debug: return .debug
             }
         }
         
@@ -81,8 +81,12 @@ public struct Logger {
         self.level = level
     }
     
-    func log(_ message: Message...) {
-        let sorted = message.sorted(by: { $0.rawValue < $1.rawValue })
+    public func log(_ message: Message...) {
+        log(message)
+    }
+    
+    func log(_ messages: [Message]) {
+        let sorted = messages.sorted(by: { $0.rawValue < $1.rawValue })
         if let last = sorted.last {
             delegate?.onAny(last.level, last.message)
         }

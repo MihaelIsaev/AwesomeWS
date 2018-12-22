@@ -44,7 +44,7 @@ open class WS: Service, WebSocketServer {
     //MARK: Connection Handler
     
     func handleConnection(_ ws: WebSocket, _ req: Request) {
-        let client = WSClient(self, ws, req)
+        let client = WSClient(ws, req, logger: self)
         delegate?.wsOnOpen(self, client)
         logger.log(.info("onOpen"), .debug("onOpen cid: " + client.cid.uuidString))
         ws.onText { [weak self] ws, text in
@@ -66,5 +66,11 @@ open class WS: Service, WebSocketServer {
             self.logger.log(.error("onError: \(error)"))
             self.delegate?.wsOnError(self, client, error)
         }
+    }
+}
+
+extension WS: Loggable {
+    func log(_ message: Logger.Message...) {
+        logger.log(message)
     }
 }
