@@ -1,10 +1,3 @@
-//
-//  WS+Channels.swift
-//  WS
-//
-//  Created by Mihael Isaev on 22/12/2018.
-//
-
 import Foundation
 
 extension WS {

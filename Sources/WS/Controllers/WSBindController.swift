@@ -1,29 +1,37 @@
-//
-//  WSBind.swift
-//  WS
-//
-//  Created by Mihael Isaev on 22/12/2018.
-//
-
 import Foundation
 
-open class WSBind: WSObserver {
+open class WSBindController: WSObserver {
     typealias BindHandler = (WSClient, Data) -> Void
     
     var binds: [String: BindHandler] = [:]
     
     public func bind<P: Codable>(_ identifier: WSEventIdentifier<P>, _ handler: @escaping (WSClient, P?) -> Void) {
-        binds[identifier.uid] = { client, data in
+        binds[identifier.uid] = { [weak self] client, data in
             do {
                 let res = try JSONDecoder().decode(WSEvent<P>.self, from: data)
                 handler(client, res.payload)
             } catch {
-                print(error)
+                self?.logger?.log(.error(String(describing: error)))
             }
         }
     }
     
+    public func bind<P: Codable>(_ identifier: WSEventIdentifier<P>, _ handler: @escaping (WSClient, P) -> Void) {
+        binds[identifier.uid] = { [weak self] client, data in
+            do {
+                let res = try JSONDecoder().decode(WSEvent<P>.self, from: data)
+                guard let payload = res.payload else { throw WSError(reason: "Unable to unwrap payload") }
+                handler(client, payload)
+            } catch {
+                self?.logger?.log(.error(String(describing: error)))
+            }
+        }
+    }
+    
+    /// Calls when a new client connects. Override this function to handle `onOpen`.
     open func onOpen(_ client: WSClient) {}
+    
+    /// Calls when a client disconnects. Override this function to handle `onClose`.
     open func onClose(_ client: WSClient) {}
     
     public override func wsOnOpen(_ ws: WS, _ client: WSClient) -> Bool {
@@ -63,7 +71,7 @@ open class WSBind: WSObserver {
                 bind.value(client, data)
             }
         } catch {
-            print(error)
+            logger?.log(.error(String(describing: error)))
         }
     }
 }

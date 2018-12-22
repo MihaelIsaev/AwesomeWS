@@ -1,10 +1,3 @@
-//
-//  EventIdentifier.swift
-//  WS
-//
-//  Created by Mihael Isaev on 22/12/2018.
-//
-
 import Foundation
 
 public struct WSEventIdentifier<P: Codable>: Equatable, Hashable, CustomStringConvertible, ExpressibleByStringLiteral, Codable {

@@ -1,13 +1,8 @@
-//
-//  WSObserver.swift
-//  WS
-//
-//  Created by Mihael Isaev on 22/12/2018.
-//
-
 import Foundation
 
-open class WSObserver: WSDelegate {
+open class WSObserver: WSControllerable {
+    public weak var logger: WSLoggable?
+    
     public init () {}
     
     //MARK: WSDelegate

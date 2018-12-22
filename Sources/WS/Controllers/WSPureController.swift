@@ -1,13 +1,6 @@
-//
-//  WSPure.swift
-//  WS
-//
-//  Created by Mihael Isaev on 22/12/2018.
-//
-
 import Foundation
 
-open class WSPure: WSObserver {
+open class WSPureController: WSObserver {
     public typealias OnOpenHandler = (WSClient) -> Void
     public var onOpen: OnOpenHandler?
     

@@ -1,10 +1,3 @@
-//
-//  Event.swift
-//  WS
-//
-//  Created by Mihael Isaev on 22/12/2018.
-//
-
 import Foundation
 
 public struct NoPayload: Codable {}
@@ -16,13 +9,6 @@ public struct WSEvent<P: Codable>: Codable {
         self.event = event
         self.payload = payload
     }
-}
-
-public protocol WSEventProtocol: Codable {
-    associatedtype P: Codable
-    
-    var event: WSEventIdentifier<P> { get }
-    var payload: P? { get }
 }
 
 public struct WSEventPrototype: Codable {
