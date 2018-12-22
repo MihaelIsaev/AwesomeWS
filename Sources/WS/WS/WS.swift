@@ -6,14 +6,15 @@ open class WS: Service, WebSocketServer {
     var server = NIOWebSocketServer.default()
     var middlewares: [Middleware] = []
     
-    var clients = Set<WSClient>()
+    public internal(set) var clients = Set<WSClient>()
+    var clientsCache: [String: WSClient] = [:]
     var channels = Set<WSChannel>()
     
     var delegate: WSControllerable?
     
     public var logger = WSLogger(.off)
     
-    // MARK: Initialization
+    // MARK: - Initialization
     
     public init(at path: [PathComponent], protectedBy middlewares: [Middleware]? = nil, delegate: WSControllerable? = nil) {
         self.middlewares = middlewares ?? []
@@ -30,7 +31,28 @@ open class WS: Service, WebSocketServer {
         self.init(at: path.convertToPathComponents(), protectedBy: middlewares, delegate: delegate)
     }
     
-    //MARK: Connection Handler
+    //MARK: -
+    
+    func insertClient(_ client: WSClient) -> Bool {
+        if clients.insert(client).inserted {
+            return true
+        }
+        client.connection.close(code: .unexpectedServerError)
+        return false
+    }
+    
+    func removeClient(_ client: WSClient) {
+        clients.remove(client)
+        for (key, value) in clientsCache {
+            if value.cid == client.cid {
+                clientsCache.removeValue(forKey: key)
+                break
+            }
+        }
+        channels.forEach { $0.clients.remove(client) }
+    }
+    
+    //MARK: - Connection Handler
     
     func handleConnection(_ ws: WebSocket, _ req: Request) {
         let client = WSClient(ws, req, ws: self)

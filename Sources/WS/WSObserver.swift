@@ -8,18 +8,11 @@ open class WSObserver: WSControllerable {
     //MARK: WSDelegate
     
     public func wsOnOpen(_ ws: WS, _ client: WSClient) -> Bool {
-        if ws.clients.insert(client).inserted {
-            return true
-        }
-        client.connection.close(code: .unexpectedServerError)
-        return false
+        return ws.insertClient(client)
     }
     
     public func wsOnClose(_ ws: WS, _ client: WSClient) {
-        ws.clients.remove(client)
-        ws.channels.forEach { channel in
-            channel.clients.remove(client)
-        }
+        ws.removeClient(client)
     }
     
     public func wsOnText(_ ws: WS, _ client: WSClient, _ text: String) {}
