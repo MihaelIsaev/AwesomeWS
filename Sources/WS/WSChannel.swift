@@ -8,19 +8,19 @@
 import Foundation
 
 public class WSChannel {
-    public let uid: String
-    public var clients: [WSClient] = []
+    public let cid: String
+    public var clients = Set<WSClient>()
     init(_ uid: String) {
-        self.uid = uid
+        self.cid = uid
     }
 }
 
 extension WSChannel: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(uid)
+        hasher.combine(cid)
     }
     
     public static func == (lhs: WSChannel, rhs: WSChannel) -> Bool {
-        return lhs.uid == rhs.uid
+        return lhs.cid == rhs.cid
     }
 }

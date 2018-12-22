@@ -13,19 +13,25 @@ extension WS {
     }
     
     func joining(_ client: WSClient, data: Data) {
-        if let event = try? decodeEvent(by: .join, with: data) {
-            let uid = String(describing: event.payload?.channel)
-            let channel = channels.first { $0.uid == uid } ?? channels.insert(WSChannel(uid)).memberAfterInsert
-            channel.clients.append(client)
-            print("join event to channel: " + uid)
+        if let event = try? decodeEvent(by: .join, with: data), let payload = event.payload {
+            let cid = payload.channel.uuidString
+            let channel = channels.first { $0.cid == cid } ?? channels.insert(WSChannel(cid)).memberAfterInsert
+            channel.clients.insert(client)
+            client.channels.insert(cid)
+            channels.insert(channel)
+            
+            logger.log(.info("➡️ Some client has joined some channel"),
+                           .debug("➡️ Client \(client.cid) has joined channel \(cid)"))
         }
     }
     
     func leaving(_ client: WSClient, data: Data) {
-        if let event = try? decodeEvent(by: .leave, with: data) {
-            let uid = String(describing: event.payload?.channel)
-            channels.first { $0.uid == uid }?.clients.removeAll { $0.cid == client.cid }
-            print("leave event channel: " + uid)
+        if let event = try? decodeEvent(by: .leave, with: data), let payload = event.payload {
+            let cid = payload.channel.uuidString
+            client.channels.remove(cid)
+            channels.first { $0.cid == cid }?.clients.remove(client)
+            logger.log(.info("⬅️ Some client has left some channel"),
+                           .debug("⬅️ Client \(client.cid) has left channel \(cid)"))
         }
     }
 }

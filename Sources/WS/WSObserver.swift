@@ -23,7 +23,7 @@ open class WSObserver: WSDelegate {
     public func wsOnClose(_ ws: WS, _ client: WSClient) {
         ws.clients.remove(client)
         ws.channels.forEach { channel in
-            channel.clients.removeAll { $0.cid == client.cid }
+            channel.clients.remove(client)
         }
     }
     

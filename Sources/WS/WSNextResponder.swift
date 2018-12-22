@@ -13,9 +13,9 @@ struct WSNextResponder: Responder {
     func respond(to req: Request) throws -> Future<Response> {
         try next()
         let resp = Response(http: HTTPResponse(status: .ok,
-                                               version: HTTPVersion.init(major: 1, minor: 1),
-                                               headers: HTTPHeaders(),
-                                               body: ""), using: req)
+                                               version: req.http.version,
+                                               headers: req.http.headers,
+                                               body: req.http.body), using: req)
         return req.eventLoop.newSucceededFuture(result: resp)
     }
 }

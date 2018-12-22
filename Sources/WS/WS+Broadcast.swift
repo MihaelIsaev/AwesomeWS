@@ -30,7 +30,7 @@ extension WS: WSBroadcastable {
     }
     
     public func broadcast(on container: Container, to channel: String, _ text: String) throws -> Future<Void> {
-        return try broadcast(on: container, to: clients.filter { $0.channels.contains(channel) }, text)
+        return try broadcast(on: container, to: channels.first(where: { $0.cid == channel })?.clients ?? [], text)
     }
     
     public func broadcast(on container: Container, _ binary: Data) throws -> Future<Void> {
@@ -38,7 +38,7 @@ extension WS: WSBroadcastable {
     }
     
     public func broadcast(on container: Container, to channel: String, _ binary: Data) throws -> Future<Void> {
-        return try broadcast(on: container, to: clients.filter { $0.channels.contains(channel) }, binary)
+        return try broadcast(on: container, to: channels.first(where: { $0.cid == channel })?.clients ?? [], binary)
     }
     
     public func broadcast<T>(on container: Container, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void> where T : Decodable, T : Encodable {
@@ -46,6 +46,6 @@ extension WS: WSBroadcastable {
     }
     
     public func broadcast<T>(on container: Container, to channel: String, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void> where T : Decodable, T : Encodable {
-        return try broadcast(on: container, to: clients.filter { $0.channels.contains(channel) }, WSOutgoingEvent(event.uid, payload: payload))
+        return try broadcast(on: container, to: channels.first(where: { $0.cid == channel })?.clients ?? [], WSOutgoingEvent(event.uid, payload: payload))
     }
 }
