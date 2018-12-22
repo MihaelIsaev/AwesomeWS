@@ -4,12 +4,12 @@ import Vapor
 extension WS: WSBroadcastable {
     @discardableResult
     public func broadcast(_ text: String, to clients: Set<WSClient>, on container: Container) throws -> Future<Void> {
-        return clients.map { $0.emit(text) }.flatten(on: container)
+        return clients.map { $0.emit(text, on: container) }.flatten(on: container)
     }
     
     @discardableResult
     public func broadcast(_ binary: Data, to clients: Set<WSClient>, on container: Container) throws -> Future<Void> {
-        return clients.map { $0.emit(binary) }.flatten(on: container)
+        return clients.map { $0.emit(binary, on: container) }.flatten(on: container)
     }
     
     @discardableResult
@@ -58,12 +58,12 @@ extension WS: WSBroadcastable {
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
             throw WSError(reason: "Unable to preapare JSON string for broadcast message")
         }
-        return clients.map { $0.emit(jsonString) }.flatten(on: container)
+        return try clients.broadcast(jsonString, on: container)
     }
     
     @discardableResult
     func broadcast<T: Codable>(asBinary event: WSOutgoingEvent<T>, to clients: Set<WSClient>, on container: Container) throws -> Future<Void> {
         let jsonData = try JSONEncoder().encode(event)
-        return clients.map { $0.emit(jsonData) }.flatten(on: container)
+        return try clients.broadcast(jsonData, on: container)
     }
 }
