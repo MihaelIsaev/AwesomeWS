@@ -2,18 +2,20 @@ import Foundation
 import Vapor
 
 public protocol WSBroadcastable: class {
-    func broadcast(on container: Container, to clients: Set<WSClient>, _ text: String) throws -> Future<Void>
-    func broadcast(on container: Container, to clients: Set<WSClient>, _ binary: Data) throws -> Future<Void>
+    func broadcast(_ text: String, to clients: Set<WSClient>, on container: Container) throws -> Future<Void>
+    func broadcast(_ binary: Data, to clients: Set<WSClient>, on container: Container) throws -> Future<Void>
     
     //MARK: Text
-    func broadcast(on container: Container, _ text: String) throws -> Future<Void>
-    func broadcast(on container: Container, to channel: String, _ text: String) throws -> Future<Void>
+    func broadcast(_ text: String, on container: Container) throws -> Future<Void>
+    func broadcast(_ text: String, to channel: String, on container: Container) throws -> Future<Void>
     
     //MARK: Binary
-    func broadcast(on container: Container, _ binary: Data) throws -> Future<Void>
-    func broadcast(on container: Container, to channel: String, _ binary: Data) throws -> Future<Void>
+    func broadcast(_ binary: Data, on container: Container) throws -> Future<Void>
+    func broadcast(_ binary: Data, to channel: String, on container: Container) throws -> Future<Void>
     
     //MARK: Codable
-    func broadcast<T: Codable>(on container: Container, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void>
-    func broadcast<T: Codable>(on container: Container, to channel: String, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void>
+    func broadcast<T: Codable>(asText event: WSEventIdentifier<T>, _ payload: T?, on container: Container) throws -> Future<Void>
+    func broadcast<T: Codable>(asText event: WSEventIdentifier<T>, _ payload: T?, to channel: String, on container: Container) throws -> Future<Void>
+    func broadcast<T: Codable>(asBinary event: WSEventIdentifier<T>, _ payload: T?, on container: Container) throws -> Future<Void>
+    func broadcast<T: Codable>(asBinary event: WSEventIdentifier<T>, _ payload: T?, to channel: String, on container: Container) throws -> Future<Void>
 }

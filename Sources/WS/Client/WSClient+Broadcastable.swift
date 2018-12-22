@@ -3,42 +3,52 @@ import Vapor
 
 extension WSClient: WSBroadcastable {
     @discardableResult
-    public func broadcast(on container: Container, to clients: Set<WSClient>, _ text: String) throws -> Future<Void> {
-        return try broadcaster().broadcast(on: container, to: clients, text)
+    public func broadcast(_ text: String, to clients: Set<WSClient>, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(text, to: clients, on: container)
     }
     
     @discardableResult
-    public func broadcast(on container: Container, to clients: Set<WSClient>, _ binary: Data) throws -> Future<Void> {
-        return try broadcaster().broadcast(on: container, to: clients, binary)
+    public func broadcast(_ binary: Data, to clients: Set<WSClient>, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(binary, to: clients, on: container)
     }
     
     @discardableResult
-    public func broadcast(on container: Container, _ text: String) throws -> Future<Void> {
-        return try broadcaster().broadcast(on: container, text)
+    public func broadcast(_ text: String, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(text, on: container)
     }
     
     @discardableResult
-    public func broadcast(on container: Container, to channel: String, _ text: String) throws -> Future<Void> {
-        return try broadcaster().broadcast(on: container, to: channel, text)
+    public func broadcast(_ text: String, to channel: String, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(text, to: channel, on: container)
     }
     
     @discardableResult
-    public func broadcast(on container: Container, _ binary: Data) throws -> Future<Void> {
-        return try broadcaster().broadcast(on: container, binary)
+    public func broadcast(_ binary: Data, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(binary, on: container)
     }
     
     @discardableResult
-    public func broadcast(on container: Container, to channel: String, _ binary: Data) throws -> Future<Void> {
-        return try broadcaster().broadcast(on: container, to: channel, binary)
+    public func broadcast(_ binary: Data, to channel: String, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(binary, to: channel, on: container)
     }
     
     @discardableResult
-    public func broadcast<T>(on container: Container, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void> where T : Decodable, T : Encodable {
-        return try broadcaster().broadcast(on: container, event, payload)
+    public func broadcast<T: Codable>(asText event: WSEventIdentifier<T>, _ payload: T? = nil, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(asText: event, payload, on: container)
     }
     
     @discardableResult
-    public func broadcast<T>(on container: Container, to channel: String, _ event: WSEventIdentifier<T>, _ payload: T?) throws -> Future<Void> where T : Decodable, T : Encodable {
-        return try broadcaster().broadcast(on: container, to: channel, event, payload)
+    public func broadcast<T: Codable>(asText event: WSEventIdentifier<T>, _ payload: T? = nil, to channel: String, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(asText: event, payload, to: channel, on: container)
+    }
+    
+    @discardableResult
+    public func broadcast<T: Codable>(asBinary event: WSEventIdentifier<T>, _ payload: T? = nil, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(asBinary: event, payload, on: container)
+    }
+    
+    @discardableResult
+    public func broadcast<T: Codable>(asBinary event: WSEventIdentifier<T>, _ payload: T? = nil, to channel: String, on container: Container) throws -> Future<Void> {
+        return try broadcaster().broadcast(asBinary: event, payload, to: channel, on: container)
     }
 }
