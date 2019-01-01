@@ -168,7 +168,10 @@ Ok this is all about receiving websocket events.. what about sending?
 
 ## Sending events
 
-You could get an instance of `WS` anywhere where you have `Container`, e.g. in any request handler and use broadcast methods on it like this:
+You could get an instance of `WS` anywhere where you have `Container`.
+
+### Broadcasting to some channel
+e.g. in any request handler use broadcast method on `ws` object like this:
 ```swift
 import WS
 
@@ -178,6 +181,19 @@ func sampleGetRequestHandler(_ req: Request) throws -> Future<HTTPStatus> {
     let payload = MessagePayload(fromUser: User.Public(user), text: "Some text")
     return try ws.broadcast(asBinary: .message, payload, to: "some channel", on: req)
                  .transform(to: .ok)
+}
+```
+
+### Sending some event to concrete client
+e.g. in any request handler find needed client from `ws.clients` set and then use `emit` or `broadcast` method
+```swift
+import WS
+
+func sampleGetRequestHandler(_ req: Request) throws -> Future<HTTPStatus> {
+    let user = try req.requireAuthenticated(User.self)
+    let ws = try req.make(WS.self)
+    let payload = MessagePayload(fromUser: User.Public(user), text: "Some text")
+    return ws.clients.first!.emit("hello world", on: req).transform(to: .ok) //do not use force unwraiing in production!
 }
 ```
 
