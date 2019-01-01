@@ -151,7 +151,7 @@ As you may see in every handler in both pure and bind controllers you always hav
 
 **methods**
 - subscribe(to channels: [String]) - use it to subscribe client to some channels
-- unsubscribe(to channels: [String]) - use it to unsubscribe client to some channels
+- unsubscribe(from channels: [String]) - use it to unsubscribe client from some channels
 - broadcast - a lot of broadcast variations, just use autocompletion to determine needed one
 
 More than that, it is `DatabaseConnectable`, so you could run your queries like this
@@ -165,6 +165,25 @@ let user = try client.req.requireAuthenticated(User.self)
 ```
 
 Ok this is all about receiving websocket events.. what about sending?
+
+## Connected users
+
+In `WS` object which is available from any container through `.make` method you could find a set of `clients`
+```swift
+let ws = try req.make(WS.self)
+ws.clients //this is a set of all connected clients
+```
+
+## Channels
+
+Any client may be subscribed or unsubscribed from some channels.
+
+Channel is `WSChannel` obejct with unique `cid` which is `String`.
+
+You could subscribe/unsubscribe client to any channel by calling `client,subscribe(to:)` or `client,unsubscribe(from:)`
+
+And you could broadcast to channels by calling `ws.broadcast`
+
 
 ## Sending events
 
