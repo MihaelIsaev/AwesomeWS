@@ -144,15 +144,15 @@ It is actual for both sending and receiving events.
 As you may see in every handler in both pure and bind controllers you always have `client` object. This object is `WSClient` class which contains a lot of useful things inside, like
 
 **variables**
-`cid` - UUID
-`req` - original Request
-`eventLoop` - EventLoop
-`channels` - a list of channels of that user
+- `cid` - UUID
+- `req` - original Request
+- `eventLoop` - EventLoop
+- `channels` - a list of channels of that user
 
 **methods**
-subscribe(to channels: [String]) - use it to subscribe client to some channels
-unsubscribe(to channels: [String]) - use it to unsubscribe client to some channels
-broadcast - a lot of broadcast variations, just use autocompletion to determine needed one
+- subscribe(to channels: [String]) - use it to subscribe client to some channels
+- unsubscribe(to channels: [String]) - use it to unsubscribe client to some channels
+- broadcast - a lot of broadcast variations, just use autocompletion to determine needed one
 
 More than that, it is `DatabaseConnectable`, so you could run your queries like this
 ```swift
