@@ -183,7 +183,7 @@ func sampleGetRequestHandler(_ req: Request) throws -> Future<HTTPStatus> {
 
 ## How to connect from iOS, macOS, etc?
 
-For example you could use (Starscream lib)[https://github.com/daltoniam/Starscream]
+For example you could use [Starscream lib](https://github.com/daltoniam/Starscream)
 
 ## How to connect from Android?
 
@@ -193,7 +193,7 @@ Use any lib which support pure websockets protocol, e.g. not SocketIO cause it u
 
 Yeah, we have them!
 
-AlexoChat project (server)[https://github.com/MihaelIsaev/AlexoChat] and (client)[https://github.com/emvakar/Chat_client]
+AlexoChat project [server](https://github.com/MihaelIsaev/AlexoChat) and [client](https://github.com/emvakar/Chat_client)
 
 ## Contacts
 
