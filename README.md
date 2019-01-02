@@ -13,7 +13,7 @@
 </p>
 <br>
 
-Receive & send websocket messages through convenient providers
+Receive & send websocket messages through convenient controllers
 
 **🚧 This project is under active development and API's and ideology may be changed or renamed until v1.0.0 🚧**
 
@@ -38,14 +38,14 @@ let ws = WS(at: "ws", protectedBy: [someMiddleware1, someMiddleware2], delegate:
 services.register(ws, as: WebSocketServer.self)
 ```
 Let's take a look at WS initializations params.
-First param is path of endpoint where you'd like to listen for websocket connection, in this example is `/ws`, but you should provide any as you do it for any enpoint in Vapor router.
-Second param is optional, it's an array of middlewares which are protecting your websocket endpoint. e.g. you could use here 
+First param is a path of endpoint where you'd like to listen for a websocket connection, in this example it is `/ws`, but you could provide any as you do it for enpoints in Vapor router.
+Second param is optional, it's an array of middlewares which are protecting your websocket endpoint. e.g. for protecting b bearer token 
 ```swift
 let tokenAuthMiddleware = User.tokenAuthMiddleware()
 let guardAuthMiddleware = User.guardAuthMiddleware()
 ```
-middlewares for protecting your ws endpoint by bearer token.
-Third parameter is a delegate object which will receive and handle all ws events like onOpen, onClose, onText, onBinary, onError.
+
+Third parameter is a controller object which will receive and handle all ws events like onOpen, onClose, onText, onBinary, onError.
 
 ### Controllers
 
