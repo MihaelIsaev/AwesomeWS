@@ -47,6 +47,8 @@ let guardAuthMiddleware = User.guardAuthMiddleware()
 
 Third parameter is a controller object which will receive and handle all ws events like onOpen, onClose, onText, onBinary, onError.
 
+**⚠️ If you use middlewares please do not send any events to the server right in `onOpen` method. It is discussed in [#1](../../issues/1)**
+
 ### Controllers
 
 #### Pure controller (classic)
