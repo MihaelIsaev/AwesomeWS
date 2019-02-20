@@ -13,7 +13,7 @@ class WSDefaultDateFormatter: DateFormatter {
         self.locale = Locale(identifier: "en_US_POSIX")
         self.timeZone = TimeZone(identifier: "UTC")
         //with milliseconds and without timezone
-        self.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSS"
+        self.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSSZZZZZ"
     }
     
     override init() {
