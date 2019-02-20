@@ -13,6 +13,7 @@ open class WS: Service, WebSocketServer {
     var delegate: WSControllerable?
     
     public var logger = WSLogger(.off)
+    public var dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .formatted(WSDefaultDateFormatter())
     
     // MARK: - Initialization
     

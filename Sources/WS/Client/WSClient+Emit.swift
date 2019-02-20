@@ -56,6 +56,8 @@ extension WSClient {
     /// Sends Codable model encoded to JSON binary
     @discardableResult
     public func emit<T: Codable>(asBinary event: WSEventIdentifier<T>, payload: T? = nil, on container: Container) throws -> Future<Void> {
-        return emit(try JSONEncoder().encode(WSOutgoingEvent(event.uid, payload: payload)), on: container)
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.dateEncodingStrategy = try container.make(WS.self).dateEncodingStrategy
+        return emit(try jsonEncoder.encode(WSOutgoingEvent(event.uid, payload: payload)), on: container)
     }
 }

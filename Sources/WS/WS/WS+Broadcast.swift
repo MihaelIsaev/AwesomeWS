@@ -87,7 +87,9 @@ extension WS: WSBroadcastable {
     
     @discardableResult
     func broadcast<T: Codable>(asBinary event: WSOutgoingEvent<T>, to clients: Set<WSClient>, on container: Container) throws -> Future<Void> {
-        let jsonData = try JSONEncoder().encode(event)
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.dateEncodingStrategy = try container.make(WS.self).dateEncodingStrategy
+        let jsonData = try jsonEncoder.encode(event)
         return try clients.broadcast(jsonData, on: container)
     }
 }
