@@ -7,7 +7,9 @@ extension WS: WSChannelable {
             } else {
                 let channel = WSChannel(ch)
                 channel.clients.insert(client)
-                self.channels.insert(channel)
+                if !self.channels.contains(channel) {
+                    self.channels.insert(channel)
+                }
             }
         }
     }
