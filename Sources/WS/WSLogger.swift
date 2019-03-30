@@ -1,8 +1,9 @@
 import Foundation
+import Vapor
 
 public protocol WSLoggerDelegate: class {
-    func onAny(_ level: WSLogger.Level, _ message: String)
-    func onCurrentLevel(_ message: String)
+    func onAny(_ level: WSLogger.Level, _ message: String, container: Container)
+    func onCurrentLevel(_ message: String, container: Container)
 }
 
 public struct WSLogger {
@@ -74,19 +75,19 @@ public struct WSLogger {
         self.level = level
     }
     
-    public func log(_ message: Message...) {
-        log(message)
+    public func log(_ message: Message..., on container: Container) {
+        log(message, on: container)
     }
     
-    func log(_ messages: [Message]) {
+    func log(_ messages: [Message], on container: Container) {
         let sorted = messages.sorted(by: { $0.rawValue < $1.rawValue })
         if let last = sorted.last {
-            delegate?.onAny(last.level, last.message)
+            delegate?.onAny(last.level, last.message, container: container)
         }
         if let last = sorted.filter({ $0.rawValue <= self.level.rawValue }).last {
             let message = "⚡️ [WS][" + last.symbol + "]: " + last.message
             print(message)
-            delegate?.onCurrentLevel(message)
+            delegate?.onCurrentLevel(message, container: container)
         }
     }
 }

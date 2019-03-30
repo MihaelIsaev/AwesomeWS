@@ -1,3 +1,5 @@
+import Vapor
+
 public protocol WSLoggable: class {
-    func log(_ message: WSLogger.Message...)
+    func log(_ message: WSLogger.Message..., on container: Container)
 }

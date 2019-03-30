@@ -90,6 +90,10 @@ extension WS: WSBroadcastable {
         let jsonEncoder = JSONEncoder()
         jsonEncoder.dateEncodingStrategy = try container.make(WS.self).dateEncodingStrategy
         let jsonData = try jsonEncoder.encode(event)
+        print("clients.count: \(clients.count)")
+        for c in clients {
+            print("client: \(c)")
+        }
         return try clients.broadcast(jsonData, on: container)
     }
 }

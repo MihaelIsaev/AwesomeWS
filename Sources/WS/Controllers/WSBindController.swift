@@ -11,7 +11,7 @@ open class WSBindController: WSObserver {
                 let res = try JSONDecoder().decode(WSEvent<P>.self, from: data)
                 handler(client, res.payload)
             } catch {
-                self?.logger?.log(.error(String(describing: error)))
+                self?.logger?.log(.error(String(describing: error)), on: client.req)
             }
         }
     }
@@ -23,7 +23,7 @@ open class WSBindController: WSObserver {
                 guard let payload = res.payload else { throw WSError(reason: "Unable to unwrap payload") }
                 handler(client, payload)
             } catch {
-                self?.logger?.log(.error(String(describing: error)))
+                self?.logger?.log(.error(String(describing: error)), on: client.req)
             }
         }
     }
@@ -63,15 +63,15 @@ open class WSBindController: WSObserver {
         do {
             let prototype = try JSONDecoder().decode(WSEventPrototype.self, from: data)
             switch prototype.event {
-            case "join": ws.joining(client, data: data)
-            case "leave": ws.leaving(client, data: data)
+            case "join": ws.joining(client, data: data, on: client.req)
+            case "leave": ws.leaving(client, data: data, on: client.req)
             default: break
             }
             if let bind = binds.first(where: { $0.0 == prototype.event }) {
                 bind.value(client, data)
             }
         } catch {
-            logger?.log(.error(String(describing: error)))
+            logger?.log(.error(String(describing: error)), on: client.req)
         }
     }
 }

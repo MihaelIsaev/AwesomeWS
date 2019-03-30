@@ -59,27 +59,27 @@ open class WS: Service, WebSocketServer {
         let client = WSClient(ws, req, ws: self)
         delegate?.wsOnOpen(self, client)
         logger.log(.info("onOpen"),
-                       .debug("onOpen cid: " + client.cid.uuidString + "headers: \(req.http.headers)"))
+                       .debug("onOpen cid: " + client.cid.uuidString + "headers: \(req.http.headers)"), on: req)
         ws.onText { [weak self] ws, text in
             guard let self = self else { return }
             self.logger.log(.info("onText"),
-                                 .debug("onText: " + text))
+                                 .debug("onText: " + text), on: req)
             self.delegate?.wsOnText(self, client, text)
         }
         ws.onBinary { [weak self] ws, data in
             guard let self = self else { return }
             self.logger.log(.info("onBinary"),
-                                 .debug("onBinary: \(data.count) bytes"))
+                                 .debug("onBinary: \(data.count) bytes"), on: req)
             self.delegate?.wsOnBinary(self, client, data)
         }
         ws.onClose.always {
             self.logger.log(.info("onClose"),
-                                 .debug("onClose cid: " + client.cid.uuidString))
+                                 .debug("onClose cid: " + client.cid.uuidString), on: req)
             self.delegate?.wsOnClose(self, client)
         }
         ws.onError { [weak self] ws, error in
             guard let self = self else { return }
-            self.logger.log(.error("onError: \(error)"))
+            self.logger.log(.error("onError: \(error)"), on: req)
             self.delegate?.wsOnError(self, client, error)
         }
     }

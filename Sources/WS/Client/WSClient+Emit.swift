@@ -47,7 +47,7 @@ extension WSClient {
     public func emit<T: Codable>(asText event: WSEventIdentifier<T>, payload: T? = nil, on container: Container) throws -> Future<Void> {
         let jsonData = try JSONEncoder().encode(event)
         guard let jsonString = String(data: jsonData, encoding: .utf8) else {
-            logger?.log(.error("Unable to preapare JSON string emit"))
+            logger?.log(.error("Unable to preapare JSON string emit"), on: container)
             throw WSError(reason: "Unable to preapare JSON string emit")
         }
         return emit(jsonString, on: container)
