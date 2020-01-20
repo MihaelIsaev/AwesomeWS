@@ -26,7 +26,7 @@ Edit your `Package.swift`
 //add this repo to dependencies
 .package(url: "https://github.com/MihaelIsaev/AwesomeWS.git", from: "2.0.0")
 //and don't forget about targets
-//"WS"
+.target(name: "App", dependencies: ["Vapor", "WS"]),
 ```
 
 ### How it works ?
