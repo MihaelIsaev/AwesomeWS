@@ -285,7 +285,7 @@ Use any lib which support pure websockets protocol, e.g. not SocketIO cause it u
 
 ## Examples
 
-- [v1] AlexoChat project [server](https://github.com/MihaelIsaev/AlexoChat) and [client](https://github.com/emvakar/Chat_client)
+There are no examples for Vapor 4 yet unfortunately.
 
 ## Contacts
 
