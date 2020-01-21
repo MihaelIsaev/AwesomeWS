@@ -265,7 +265,7 @@ As you may see in every handler you always have `client` object. This object con
 - `sockets` - original socket connection of the client
 - `exchangeMode` - client's observer exchange mode
 
-**conformanses**
+**conformance**
 - `Sendable` - so you can use `.send(...)`
 - `Subscribable` - so you can use `.subscribe(...)`, `.unsubscribe(...)`
 - `Disconnectable` - so you can call `.disconnect()` to disconnect that user
