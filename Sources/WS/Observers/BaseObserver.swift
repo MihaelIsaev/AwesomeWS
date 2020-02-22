@@ -10,7 +10,9 @@ open class BaseObserver {
     public var encoder: Encoder?
     public var decoder: Decoder?
 
-    public internal(set) var clients: [AnyClient] = []
+    public var clients: [AnyClient] {
+        get { _clients }
+    }
     var _clients: [_AnyClient] = []
 
     public required init (app: Application, key: String, path: String, exchangeMode: ExchangeMode) {
