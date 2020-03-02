@@ -3,7 +3,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "WS",
+    name: "AwesomeWS",
     platforms: [
        .macOS(.v10_15)
     ],

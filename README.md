@@ -5,7 +5,7 @@
         <img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="MIT License">
     </a>
     <a href="https://swift.org">
-        <img src="https://img.shields.io/badge/swift-5.1-brightgreen.svg" alt="Swift 5.1">
+        <img src="https://img.shields.io/badge/swift-5.1-brightgreen.svg" alt="Swift 5.2">
     </a>
 </p>
 <br>
@@ -26,7 +26,10 @@ Edit your `Package.swift`
 //add this repo to dependencies
 .package(url: "https://github.com/MihaelIsaev/AwesomeWS.git", from: "2.0.0")
 //and don't forget about targets
-.target(name: "App", dependencies: ["Vapor", "WS"]),
+.target(name: "App", dependencies: [
+    .product(name: "WS", package: "AwesomeWS"),
+    .product(name: "Vapor", package: "vapor")
+]),
 ```
 
 ### How it works ?
