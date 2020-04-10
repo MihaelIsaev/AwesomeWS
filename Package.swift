@@ -11,8 +11,8 @@ let package = Package(
         .library(name: "WS", targets: ["WS"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0-rc"),
-        .package(url: "https://github.com/vapor/websocket-kit.git", from: "2.0.0-rc")
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+        .package(url: "https://github.com/vapor/websocket-kit.git", from: "2.0.0")
     ],
     targets: [
         .target(name: "WS", dependencies: [
