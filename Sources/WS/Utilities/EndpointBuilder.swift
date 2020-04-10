@@ -73,7 +73,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
         WSRoute(root: application.grouped(middlewares), path: path).webSocket(onUpgrade: observer.handle)
         
         let observerType = String(describing: Observer.self)
-        application.logger.notice("[⚡️] 🚀 \(observerType) starting on \(application.server.configuration.address)/\(path.string)")
+        application.logger.notice("[⚡️] 🚀 \(observerType) starting on \(application.http.server.configuration.address)/\(path.string)")
         
         return observer
     }
