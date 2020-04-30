@@ -86,7 +86,7 @@ extension _Bindable {
     }
     
     func _on(data: Data, client: _AnyClient) {
-        proceedData(client, data)
+        // byteBuffer used instead
     }
 
     private func proceedData(_ client: _AnyClient, _ data: Data) {
