@@ -8,7 +8,7 @@ public protocol AnyClient: Broadcastable, Disconnectable, Subscribable, Sendable
     var eventLoop: EventLoop { get }
     var originalRequest: Request { get }
     var channels: Set<String> { get }
-    var sockets: [WebSocket] { get }
+    var socket: WebSocket { get }
     var observer: AnyObserver { get }
 }
 

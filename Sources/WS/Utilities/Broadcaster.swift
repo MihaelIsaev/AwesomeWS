@@ -55,7 +55,7 @@ public class Broadcaster: Disconnectable, _Disconnectable, Sendable, _Sendable, 
         if let cachedSockets = cachedSockets {
             return cachedSockets
         }
-        let sockets = filteredClients.flatMap { $0.sockets }
+        let sockets = filteredClients.map { $0.socket }
         cachedSockets = sockets
         return sockets
     }

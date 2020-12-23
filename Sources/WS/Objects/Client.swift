@@ -14,7 +14,8 @@ class Client: _AnyClient {
     /// See `_Sendable`
     let observer: AnyObserver
     let _observer: _AnyObserver
-    let sockets: [WebSocketKit.WebSocket]
+    let socket: WebSocketKit.WebSocket
+    var sockets: [WebSocket] { [socket] }
     
     /// See `AnyClient`
     public internal(set) var channels: Set<String> = []
@@ -28,7 +29,7 @@ class Client: _AnyClient {
         self.originalRequest = request
         self.application = request.application
         self.logger = logger
-        self.sockets = [socket]
+        self.socket = socket
     }
 }
 
