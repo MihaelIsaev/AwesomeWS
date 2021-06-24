@@ -169,4 +169,8 @@ public class Broadcaster: Disconnectable, _Disconnectable, Sendable, _Sendable, 
     public func send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> {
         _send(event: event, payload: payload)
     }
+    
+    public func sendPing() -> EventLoopFuture<Void> {
+        _sendPing()
+    }
 }

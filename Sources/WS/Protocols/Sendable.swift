@@ -18,6 +18,8 @@ public protocol Sendable {
     func send<T: Codable>(event: EID<T>) -> EventLoopFuture<Void>
     @discardableResult
     func send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void>
+    @discardableResult
+    func sendPing() -> EventLoopFuture<Void>
 }
 
 internal protocol _Sendable: Sendable {
@@ -114,6 +116,12 @@ extension _Sendable {
     func _send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> {
         send(model: Event(event: event.id, payload: payload))
     }
+    
+    func _sendPing() -> EventLoopFuture<Void> {
+        eventLoop.future().map {
+            self.sockets.forEach { $0.sendPing() }
+        }
+    }
 }
 
 // MARK: - EventLoopFuture
@@ -149,5 +157,9 @@ extension EventLoopFuture: Sendable where Value: Sendable {
     
     public func send<T>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> where T : Decodable, T : Encodable {
         flatMap { $0.send(event: event, payload: payload) }
+    }
+    
+    public func sendPing() -> EventLoopFuture<Void> {
+        flatMap { $0.sendPing() }
     }
 }
