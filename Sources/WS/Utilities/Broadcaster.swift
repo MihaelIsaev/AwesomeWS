@@ -113,16 +113,16 @@ public class Broadcaster: Disconnectable, _Disconnectable, Sendable, _Sendable, 
     /// See `Subscribable`
     
     /// Subscribe filtered clients to channels
-    public func subscribe(to channels: [String]) -> EventLoopFuture<Void> {
+    public func subscribe(to channels: [String], on eventLoop: EventLoop) -> EventLoopFuture<Void> {
         clients.map {
-            $0.subscribe(to: channels)
+            $0.subscribe(to: channels, on: eventLoop)
         }.flatten(on: eventLoop)
     }
     
     /// Unsubscribe filtered clients from channels
-    public func unsubscribe(from channels: [String]) -> EventLoopFuture<Void> {
+    public func unsubscribe(from channels: [String], on eventLoop: EventLoop) -> EventLoopFuture<Void> {
         clients.map {
-            $0.unsubscribe(from: channels)
+            $0.unsubscribe(from: channels, on: eventLoop)
         }.flatten(on: eventLoop)
     }
     

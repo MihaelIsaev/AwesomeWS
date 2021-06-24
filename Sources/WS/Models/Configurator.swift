@@ -95,4 +95,26 @@ public struct Configurator {
             application.storage[DefaultDecoderKey.self] = newValue
         }
     }
+    
+    // MARK: - Default Decoder
+    
+    struct KnownEventLoopKey: StorageKey {
+        typealias Value = EventLoop
+    }
+    
+    /// Default encoder for all the observers, if `nil` then `JSONEncoder` is used.
+    public var knownEventLoop: EventLoop {
+        get {
+            if let eventLoop = application.storage[KnownEventLoopKey.self] {
+                return eventLoop
+            } else {
+                let eventLoop = application.eventLoopGroup.next()
+                application.storage[KnownEventLoopKey.self] = eventLoop
+                return eventLoop
+            }
+        }
+        nonmutating set {
+            application.storage[KnownEventLoopKey.self] = newValue
+        }
+    }
 }

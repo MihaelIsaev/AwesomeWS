@@ -41,7 +41,7 @@ internal protocol _AnyObserver: AnyObserver, _Disconnectable, _Sendable {
 // MARK: - Default implementation
 
 extension AnyObserver {
-    public var eventLoop: EventLoop { application.eventLoopGroup.next() }
+    public var eventLoop: EventLoop { application.ws.knownEventLoop }
    
     var _encoder: Encoder {
         if let encoder = self.encoder {

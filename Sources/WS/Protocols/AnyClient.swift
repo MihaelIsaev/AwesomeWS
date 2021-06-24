@@ -18,7 +18,7 @@ internal protocol _AnyClient: AnyClient, _Disconnectable, _Subscribable, _Sendab
 }
 
 extension AnyClient {
-    public var eventLoop: EventLoop { application.eventLoopGroup.next() }
+    public var eventLoop: EventLoop { application.ws.knownEventLoop }
     public var logger: Logger { application.logger }
     
     /// See `Broadcastable`
