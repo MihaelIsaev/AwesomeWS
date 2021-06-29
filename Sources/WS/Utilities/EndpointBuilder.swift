@@ -60,6 +60,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
     /// Starts websocket to listen on configured enpoint
     @discardableResult
     public func serve() -> Observer {
+        _ = application.ws.knownEventLoop
         let observer = Observer.init(app: application, key: wsid.key, path: path.string, exchangeMode: exchangeMode)
         
         if let encoder = encoder {
