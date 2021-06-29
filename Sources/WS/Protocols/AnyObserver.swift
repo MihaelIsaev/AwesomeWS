@@ -98,17 +98,23 @@ extension _AnyObserver {
     
     func handle(_ req: Request, _ ws: WebSocketKit.WebSocket) {
         let client = Client(self, req, ws, logger: logger)
-        _clients.append(client)
         
-        _on(open: client)
-        on(open: client)
-        logger.info("[⚡️] 🟢 new connection \(client.id)")
+        self.application.ws.knownEventLoop.submit {
+            self._clients.append(client)
+        }.whenComplete { _ in
+            self._on(open: client)
+            self.on(open: client)
+            self.logger.info("[⚡️] 🟢 new connection \(client.id)")
+        }
         
         _ = ws.onClose.map {
-            self.logger.info("[⚡️] 🔴 connection closed \(client.id)")
-            self._clients.removeAll(where: { $0 === client })
-            self._on(close: client)
-            self.on(close: client)
+            self.application.ws.knownEventLoop.submit {
+                self._clients.removeAll(where: { $0 === client })
+            }.whenComplete { _ in
+                self.logger.info("[⚡️] 🔴 connection closed \(client.id)")
+                self._on(close: client)
+                self.on(close: client)
+            }
         }
         
         ws.onPing { _ in
