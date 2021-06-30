@@ -97,39 +97,55 @@ extension _AnyObserver {
     /// Internal handler
     
     func handle(_ req: Request, _ ws: WebSocketKit.WebSocket) {
-        let client = Client(self, req, ws, logger: logger)
+        var client: Client?
         
-        self.application.ws.knownEventLoop.submit {
-            self._clients.append(client)
-        }.whenComplete { _ in
+        self.application.ws.knownEventLoop.submit { [weak self] in
+            guard let self = self else { return }
+            let c = Client(self, req, ws, logger: self.logger)
+            client = c
+            self._clients.append(c)
+        }.whenComplete { [weak self] _ in
+            guard
+                let client = client,
+                let self = self
+            else { return }
             self._on(open: client)
             self.on(open: client)
             self.logger.info("[⚡️] 🟢 new connection \(client.id)")
         }
-        
-        _ = ws.onClose.map {
-            self.application.ws.knownEventLoop.submit {
-                self._clients.removeAll(where: { $0 === client })
-            }.whenComplete { _ in
-                self.logger.info("[⚡️] 🔴 connection closed \(client.id)")
-                self._on(close: client)
-                self.on(close: client)
+
+        ws.onClose.whenComplete { [weak self] _ in
+            guard let self = self else { return }
+            self.application.ws.knownEventLoop.submit { [weak self] in
+                self?._clients.removeAll(where: { $0 === client })
+            }.whenComplete { [weak self] _ in
+                guard let c = client, let self = self else { return }
+                self.logger.info("[⚡️] 🔴 connection closed \(c.id)")
+                self._on(close: c)
+                self.on(close: c)
+                client = nil
             }
         }
         
-        ws.onPing { _ in
-            self.logger.debug("[⚡️] 🏓 ping \(client.id)")
-            self._on(ping: client)
-            self.on(ping: client)
+        ws.onPing { [weak self] _ in
+            guard let client = client else { return }
+            self?.logger.debug("[⚡️] 🏓 ping \(client.id)")
+            self?._on(ping: client)
+            self?.on(ping: client)
         }
         
-        ws.onPong { _ in
-            self.logger.debug("[⚡️] 🏓 pong \(client.id)")
-            self._on(pong: client)
-            self.on(pong: client)
+        ws.onPong { [weak self] _ in
+            guard let client = client else { return }
+            self?.logger.debug("[⚡️] 🏓 pong \(client.id)")
+            self?._on(pong: client)
+            self?.on(pong: client)
         }
         
-        ws.onText { _, text in
+        ws.onText { [weak self] _, text in
+            guard
+                let client = client,
+                let self = self
+            else { return }
             guard self.exchangeMode != .binary else {
                 self.logger.warning("[⚡️] ❗️📤❗️incoming text event has been rejected. Observer is in `binary` mode.")
                 return
@@ -139,7 +155,11 @@ extension _AnyObserver {
             self.on(text: text, client: client)
         }
         
-        ws.onBinary { _, byteBuffer in
+        ws.onBinary { [weak self] _, byteBuffer in
+            guard
+                let client = client,
+                let self = self
+            else { return }
             guard self.exchangeMode != .text else {
                 self.logger.warning("[⚡️] ❗️📤❗️incoming binary event has been rejected. Observer is in `text` mode.")
                 return

@@ -38,7 +38,8 @@ extension _Bindable {
     }
     
     func _bindOptional<P: Codable>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P?) -> Void) {
-        binds[identifier.id] = { client, data in
+        binds[identifier.id] = { [weak self] client, data in
+            guard let self = self else { return }
             do {
                 let res = try self._decoder.decode(Event<P>.self, from: data)
                 handler(client, res.payload)
@@ -49,7 +50,8 @@ extension _Bindable {
     }
 
     func _bind<P: Codable>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P) -> Void) {
-        binds[identifier.id] = { client, data in
+        binds[identifier.id] = { [weak self] client, data in
+            guard let self = self else { return }
             do {
                 let res = try self._decoder.decode(Event<P>.self, from: data)
                 if let payload = res.payload {
