@@ -222,13 +222,13 @@ Available methods
 
 #### Subscribe
 ```swift
-client.subscribe(to: ...) // will subscribe client to provided channels
+client.subscribe(to: ..., on: eventLoop) // will subscribe client to provided channels
 ```
 To subscribe to `news` and `updates` call it like this `client.subscribe(to: "news", "updates")`
 
 #### Unsubscribe
 ```swift
-client.unsubscribe(from: ...) // will unsubscribe client from provided channels
+client.unsubscribe(from: ..., on: eventLoop) // will unsubscribe client from provided channels
 ```
 
 #### List
