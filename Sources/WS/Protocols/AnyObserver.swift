@@ -1,6 +1,6 @@
 import Vapor
 
-public protocol AnyObserver: class, Broadcastable, CustomStringConvertible, Disconnectable, Sendable, Loggable {
+public protocol AnyObserver: AnyObject, Broadcastable, CustomStringConvertible, Disconnectable, Sendable, Loggable {
     var key: String { get }
     var path: String { get }
     
