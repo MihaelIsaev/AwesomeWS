@@ -2,7 +2,7 @@ import Vapor
 
 public class EndpointBuilder<Observer: AnyObserver> {
     let application: Application
-    let wsid: WSID<Observer>
+    let wsid: WebSocketID<Observer>
     
     var path: [PathComponent] = []
     var middlewares: [Middleware] = []
@@ -10,7 +10,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
     var encoder: Encoder?
     var decoder: Decoder?
     
-    init (_ application: Application, _ wsid: WSID<Observer>) {
+    init (_ application: Application, _ wsid: WebSocketID<Observer>) {
         self.application = application
         self.wsid = wsid
     }

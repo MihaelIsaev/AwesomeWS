@@ -11,7 +11,7 @@ public struct Configurator {
     
     /// Websocket endpoint builder.
     /// Don't forget to call `.serve()` in the end.
-    public func build<Observer: AnyObserver>(_ wsid: WSID<Observer>) -> EndpointBuilder<Observer> {
+    public func build<Observer: AnyObserver>(_ wsid: WebSocketID<Observer>) -> EndpointBuilder<Observer> {
         .init(application, wsid)
     }
     
@@ -20,9 +20,9 @@ public struct Configurator {
     /// Returns default observer.
     /// Works only after `.build()`, otherwise fatal error.
     public func observer() -> AnyObserver {
-        var anywsid: AnyWSID? = application.ws.default
+        var anywsid: AnyWebSocketID? = application.ws.default
         if anywsid == nil, let key = application.wsStorage.items.values.first?.key {
-            anywsid = _WSID(key: key)
+            anywsid = _WebSocketID(key: key)
             application.logger.warning("[⚡️] 🚩 Default websocket observer is nil. Use app.ws.setDefault(...). Used first available websocket.")
         }
         guard let wsid = anywsid else {
@@ -34,28 +34,28 @@ public struct Configurator {
         return observer
     }
     
-    /// Returns observer for WSID.
+    /// Returns observer for WebSocketID.
     /// Works only after `.build()`, otherwise fatal error.
-    public func observer<Observer>(_ wsid: WSID<Observer>) -> Observer {
+    public func observer<Observer>(_ wsid: WebSocketID<Observer>) -> Observer {
         guard let observer = application.wsStorage[wsid.key] as? Observer else {
             fatalError("[⚡️] 🚩Websokcet with key `\(wsid.key)` is not running. Use app.ws.build(...).serve()")
         }
         return observer
     }
 
-    // MARK: - Default WSID storage
+    // MARK: - Default WebSocketID storage
     
-    /// Saves WSID as default.
-    /// After that you could call just `req.ws().send(...)` without providing WSID.
-    public func setDefault<Observer>(_ wsid: WSID<Observer>) {
+    /// Saves WebSocketID as default.
+    /// After that you could call just `req.ws().send(...)` without providing WebSocketID.
+    public func setDefault<Observer>(_ wsid: WebSocketID<Observer>) {
         self.default = wsid
     }
     
     struct DefaultWSIDKey: StorageKey {
-        typealias Value = AnyWSID
+        typealias Value = AnyWebSocketID
     }
     
-    var `default`: AnyWSID? {
+    var `default`: AnyWebSocketID? {
         get {
             application.storage[DefaultWSIDKey.self]
         }
