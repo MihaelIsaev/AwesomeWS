@@ -46,7 +46,7 @@ public struct Configurator {
     // MARK: - Default WebSocketID storage
     
     /// Saves WebSocketID as default.
-    /// After that you could call just `req.ws().send(...)` without providing WebSocketID.
+    /// After that you could call just `req.webSocketObserver().send(...)` without providing WebSocketID.
     public func setDefault<Observer>(_ wsid: WebSocketID<Observer>) {
         self.default = wsid
     }

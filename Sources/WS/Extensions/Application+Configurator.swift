@@ -18,8 +18,8 @@ extension Application {
     ///
     /// Use it later on `Request`
     /// ```swift
-    /// req.ws().send(...)
-    /// req.ws(.customObserver).send(...)
+    /// req.webSocketObserver().send(...)
+    /// req.webSocketObserver(.customObserver).send(...)
     /// ```
     /// or `Application`
     /// ```swift

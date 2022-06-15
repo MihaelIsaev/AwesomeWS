@@ -182,26 +182,26 @@ client.send(...)
 ```swift
 client.broadcast.send(...)
 client.broadcast.exclude(client).send(...) // excluding himself
-req.ws(.mywsid).broadcast.send(...)
+req.webSocketObserver(.mywsid).broadcast.send(...)
 ```
 
 #### To clients in channels
 ```swift
 client.broadcast.channels("news", "updates").send(...)
-req.ws(.mywsid).broadcast.channels("news", "updates").send(...)
+req.webSocketObserver(.mywsid).broadcast.channels("news", "updates").send(...)
 ```
 
 #### To custom filtered clients
 e.g. you want to find all ws connections of the current user to send a message to all his devices
 ```swift
-req.ws(.mywsid).broadcast.filter { client in
+req.webSocketObserver(.mywsid).broadcast.filter { client in
     req.headers[.authorization].first == client.originalRequest.headers[.authorization].first
 }.send(...)
 ```
 
 ### Broadcast
 
-You could reach `broadcast` obejct on `app.webSocketConfigurator.observer(.mywsid)` or `req.ws(.mywsid).broadcast` or `client.broadcast`.
+You could reach `broadcast` obejct on `app.webSocketConfigurator.observer(.mywsid)` or `req.webSocketObserver(.mywsid).broadcast` or `client.broadcast`.
 
 This object is a builder, so using it you should filter recipients like this `client.broadcast.one(...).two(...).three(...).send()`
 
@@ -238,7 +238,7 @@ client.channels // will return a list of client channels
 
 ### Defaults
 
-If you have only one observer in the app you can set it as default. It will give you ability to use it without providing its WSID all the time, so you will call just `req.ws()` instead of `req.ws(.mywsid)`.
+If you have only one observer in the app you can set it as default. It will give you ability to use it without providing its WSID all the time, so you will call just `req.webSocketObserver()` instead of `req.webSocketObserver(.mywsid)`.
 ```swift
 // configure.swift
 
