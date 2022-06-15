@@ -45,23 +45,23 @@ WS lib have `.default` WSID which represents `DeclarativeObserver`.
 
 You can start working with it this easy way
 ```swift
-app.ws.build(.default).serve()
+app.webSocketConfigurator.build(.default).serve()
 ```
 In this case it will start listening for websocket connections at `/`, but you can change it before you call `.serve()`
 ```swift
-app.ws.build(.default).at("ws").serve()
+app.webSocketConfigurator.build(.default).at("ws").serve()
 ```
 Ok now it is listening at `/ws`
 
 Also you can protect your websocket endpoint with middlewares, e.g. you can check auth before connection will be established.
 ```swift
-app.ws.build(.default).at("ws").middlewares(AuthMiddleware()).serve()
+app.webSocketConfigurator.build(.default).at("ws").middlewares(AuthMiddleware()).serve()
 ```
 Ok, looks good, but how to handle incoming data?
 
 As we use `.default` WSID which represents `Declarative` observer we can handle incoming data like this
 ```swift
-app.ws.build(.default).at("ws").middlewares(AuthMiddleware()).serve().onOpen { client in
+app.webSocketConfigurator.build(.default).at("ws").middlewares(AuthMiddleware()).serve().onOpen { client in
     print("client just connected \(client.id)")
 }.onText { client, text in
     print("client \(client.id) text: \(text)")
@@ -91,7 +91,7 @@ extension WSID {
 ```
 so then start serving it
 ```swift
-app.ws.build(.myClassic).at("ws").serve()
+app.webSocketConfigurator.build(.myClassic).at("ws").serve()
 ```
 
 ### Bindable observer
@@ -152,10 +152,10 @@ extension WSID {
 ```
 then start serving it
 ```swift
-app.ws.build(.myBindable).at("ws").serve()
+app.webSocketConfigurator.build(.myBindable).at("ws").serve()
 ```
 > 💡Here you also could provide custom encoder/decoder
->  e,g, `app.ws.build(.myBindable).at("ws").encoder(JSONEncoder()).encoder(JSONDecoder()).serve()`
+>  e,g, `app.webSocketConfigurator.build(.myBindable).at("ws").encoder(JSONEncoder()).encoder(JSONDecoder()).serve()`
 
 ### How to send data
 
@@ -201,7 +201,7 @@ req.ws(.mywsid).broadcast.filter { client in
 
 ### Broadcast
 
-You could reach `broadcast` obejct on `app.ws.observer(.mywsid)` or `req.ws(.mywsid).broadcast` or `client.broadcast`.
+You could reach `broadcast` obejct on `app.webSocketConfigurator.observer(.mywsid)` or `req.ws(.mywsid).broadcast` or `client.broadcast`.
 
 This object is a builder, so using it you should filter recipients like this `client.broadcast.one(...).two(...).three(...).send()`
 
@@ -242,7 +242,7 @@ If you have only one observer in the app you can set it as default. It will give
 ```swift
 // configure.swift
 
-app.ws.setDefault(.myBindable)
+app.webSocketConfigurator.setDefault(.myBindable)
 ```
 Also you can set custom encoder/decoder for all the observers
 ```swift
@@ -250,11 +250,11 @@ Also you can set custom encoder/decoder for all the observers
 
 let encoder = JSONEncoder()
 encoder.dateEncodingStrategy = .secondsSince1970
-app.ws.encoder = encoder
+app.webSocketConfigurator.encoder = encoder
 
 let decoder = JSONDecoder()
 decoder.dateDecodingStrategy = .secondsSince1970
-app.ws.decoder = decoder
+app.webSocketConfigurator.decoder = decoder
 ```
 
 ### Client

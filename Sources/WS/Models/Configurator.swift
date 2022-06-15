@@ -20,13 +20,13 @@ public struct Configurator {
     /// Returns default observer.
     /// Works only after `.build()`, otherwise fatal error.
     public func observer() -> AnyObserver {
-        var anywsid: AnyWebSocketID? = application.ws.default
+        var anywsid: AnyWebSocketID? = application.webSocketConfigurator.default
         if anywsid == nil, let key = application.wsStorage.items.values.first?.key {
             anywsid = _WebSocketID(key: key)
-            application.logger.warning("[⚡️] 🚩 Default websocket observer is nil. Use app.ws.setDefault(...). Used first available websocket.")
+            application.logger.warning("[⚡️] 🚩 Default websocket observer is nil. Use app.webSocketConfigurator.setDefault(...). Used first available websocket.")
         }
         guard let wsid = anywsid else {
-            fatalError("[⚡️] 🚩Default websocket observer is nil. Use app.ws.default(...)")
+            fatalError("[⚡️] 🚩Default websocket observer is nil. Use app.webSocketConfigurator.default(...)")
         }
         guard let observer = application.wsStorage[wsid.key] else {
             fatalError("[⚡️] 🚩Unable to get websocket observer with key `\(wsid.key)`")
@@ -38,7 +38,7 @@ public struct Configurator {
     /// Works only after `.build()`, otherwise fatal error.
     public func observer<Observer>(_ wsid: WebSocketID<Observer>) -> Observer {
         guard let observer = application.wsStorage[wsid.key] as? Observer else {
-            fatalError("[⚡️] 🚩Websokcet with key `\(wsid.key)` is not running. Use app.ws.build(...).serve()")
+            fatalError("[⚡️] 🚩Websokcet with key `\(wsid.key)` is not running. Use app.webSocketConfigurator.build(...).serve()")
         }
         return observer
     }

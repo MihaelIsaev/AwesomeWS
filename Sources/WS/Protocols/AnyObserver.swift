@@ -41,13 +41,13 @@ internal protocol _AnyObserver: AnyObserver, _Disconnectable, _Sendable {
 // MARK: - Default implementation
 
 extension AnyObserver {
-    public var eventLoop: EventLoop { application.ws.knownEventLoop }
+    public var eventLoop: EventLoop { application.webSocketConfigurator.knownEventLoop }
    
     var _encoder: Encoder {
         if let encoder = self.encoder {
             return encoder
         }
-        if let encoder = application.ws.encoder {
+        if let encoder = application.webSocketConfigurator.encoder {
             return encoder
         }
         let encoder = JSONEncoder()
@@ -59,7 +59,7 @@ extension AnyObserver {
         if let decoder = self.decoder {
             return decoder
         }
-        if let decoder = application.ws.decoder {
+        if let decoder = application.webSocketConfigurator.decoder {
             return decoder
         }
         let decoder = JSONDecoder()
@@ -80,7 +80,7 @@ extension AnyObserver {
                exchangeMode: exchangeMode,
                logger: application.logger,
                encoder: encoder,
-               defaultEncoder: application.ws.encoder)
+               defaultEncoder: application.webSocketConfigurator.encoder)
     }
     
     /// see `CustomStringConvertible`
@@ -99,7 +99,7 @@ extension _AnyObserver {
     func handle(_ req: Request, _ ws: WebSocketKit.WebSocket) {
         var client: Client?
         
-        self.application.ws.knownEventLoop.submit { [weak self] in
+        self.application.webSocketConfigurator.knownEventLoop.submit { [weak self] in
             guard let self = self else { return }
             let c = Client(self, req, ws, logger: self.logger)
             client = c
@@ -116,7 +116,7 @@ extension _AnyObserver {
 
         ws.onClose.whenComplete { [weak self] _ in
             guard let self = self else { return }
-            self.application.ws.knownEventLoop.submit { [weak self] in
+            self.application.webSocketConfigurator.knownEventLoop.submit { [weak self] in
                 self?._clients.removeAll(where: { $0 === client })
             }.whenComplete { [weak self] _ in
                 guard let c = client, let self = self else { return }
