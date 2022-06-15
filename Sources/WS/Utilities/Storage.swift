@@ -24,14 +24,14 @@ class _Storage {
 }
 
 extension Application {
-    var wsStorage: _Storage {
+    var webSocketStorage: _Storage {
         get {
             if let ws = storage[_Storage.Key.self] {
                 return ws
             } else {
                 logger.debug("[⚡️] 📦 Storage initialized")
                 let storage = _Storage()
-                self.wsStorage = storage
+                self.webSocketStorage = storage
                 return storage
             }
         }

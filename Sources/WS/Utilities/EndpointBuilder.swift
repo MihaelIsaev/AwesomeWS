@@ -70,7 +70,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
             observer.decoder = decoder
         }
         
-        application.wsStorage[wsid.key] = observer
+        application.webSocketStorage[wsid.key] = observer
         WSRoute(root: application.grouped(middlewares), path: path).webSocket(onUpgrade: observer.handle)
         
         let observerType = String(describing: Observer.self)
