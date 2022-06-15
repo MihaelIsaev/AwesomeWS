@@ -7,23 +7,23 @@ public protocol Bindable: AnyObserver {
     /// Binds to event without payload
     ///
     /// - parameters:
-    ///     - identifier: `EID` event identifier, declare it in extension
+    ///     - identifier: `EventID` event identifier, declare it in extension
     ///     - handler: called when event happens
-    func bind<P>(_ identifier: EID<P>, _ handler: @escaping (AnyClient) -> Void) where P: Codable
+    func bind<P>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient) -> Void) where P: Codable
     
     /// Binds to event with optional payload
     ///
     /// - parameters:
-    ///     - identifier: `EID` event identifier, declare it in extension
+    ///     - identifier: `EventID` event identifier, declare it in extension
     ///     - handler: called when event happens
-    func bindOptional<P>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P?) -> Void) where P: Codable
+    func bindOptional<P>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient, P?) -> Void) where P: Codable
     
     /// Binds to event with required payload
     /// 
     /// - parameters:
-    ///     - identifier: `EID` event identifier, declare it in extension
+    ///     - identifier: `EventID` event identifier, declare it in extension
     ///     - handler: called when event happens
-    func bind<P>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P) -> Void) where P: Codable
+    func bind<P>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient, P) -> Void) where P: Codable
 }
 
 internal protocol _Bindable: Bindable, _AnyObserver {
@@ -31,13 +31,13 @@ internal protocol _Bindable: Bindable, _AnyObserver {
 }
 
 extension _Bindable {
-    func _bind<P: Codable>(_ identifier: EID<P>, _ handler: @escaping (AnyClient) -> Void) {
+    func _bind<P: Codable>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient) -> Void) {
         bindOptional(identifier) { client, _ in
             handler(client)
         }
     }
     
-    func _bindOptional<P: Codable>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P?) -> Void) {
+    func _bindOptional<P: Codable>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient, P?) -> Void) {
         binds[identifier.id] = { [weak self] client, data in
             guard let self = self else { return }
             do {
@@ -49,7 +49,7 @@ extension _Bindable {
         }
     }
 
-    func _bind<P: Codable>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P) -> Void) {
+    func _bind<P: Codable>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient, P) -> Void) {
         binds[identifier.id] = { [weak self] client, data in
             guard let self = self else { return }
             do {

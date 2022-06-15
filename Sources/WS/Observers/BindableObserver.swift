@@ -5,15 +5,15 @@ import NIOWebSocket
 open class BindableObserver: BaseObserver, Bindable, _Bindable {
     var binds: [String : BindHandler] = [:]
     
-    public func bind<P>(_ identifier: EID<P>, _ handler: @escaping (AnyClient) -> Void) where P: Codable {
+    public func bind<P>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient) -> Void) where P: Codable {
         _bind(identifier, handler)
     }
     
-    public func bindOptional<P>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P?) -> Void) where P : Codable {
+    public func bindOptional<P>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient, P?) -> Void) where P : Codable {
         _bindOptional(identifier, handler)
     }
     
-    public func bind<P>(_ identifier: EID<P>, _ handler: @escaping (AnyClient, P) -> Void) where P : Codable {
+    public func bind<P>(_ identifier: EventID<P>, _ handler: @escaping (AnyClient, P) -> Void) where P : Codable {
         _bind(identifier, handler)
     }
 }
@@ -44,11 +44,11 @@ extension BindableObserver {
         _send(model: model, encoder: encoder)
     }
     
-    public func send<T: Codable>(event: EID<T>) -> EventLoopFuture<Void> {
+    public func send<T: Codable>(event: EventID<T>) -> EventLoopFuture<Void> {
         _send(event: event, payload: nil)
     }
     
-    public func send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> {
+    public func send<T: Codable>(event: EventID<T>, payload: T?) -> EventLoopFuture<Void> {
         _send(event: event, payload: payload)
     }
     

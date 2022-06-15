@@ -4,11 +4,11 @@ import Foundation
 ///
 /// Extend it to declare your websocket events
 /// ```swift
-/// extension EID {
-///     static var userOnline: EID<UserModel> { .init("userOnline") }
+/// extension EventID {
+///     static var userOnline: EventID<UserModel> { .init("userOnline") }
 /// }
 /// ```
-public struct EID<P: Codable>: Equatable, Hashable, CustomStringConvertible, ExpressibleByStringLiteral {
+public struct EventID<P: Codable>: Equatable, Hashable, CustomStringConvertible, ExpressibleByStringLiteral {
     /// The unique id.
     public let id: String
     

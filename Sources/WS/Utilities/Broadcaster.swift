@@ -162,11 +162,11 @@ public class Broadcaster: Disconnectable, _Disconnectable, Sendable, _Sendable, 
         _send(model: model, encoder: encoder)
     }
     
-    public func send<T: Codable>(event: EID<T>) -> EventLoopFuture<Void> {
+    public func send<T: Codable>(event: EventID<T>) -> EventLoopFuture<Void> {
         _send(event: event, payload: nil)
     }
     
-    public func send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> {
+    public func send<T: Codable>(event: EventID<T>, payload: T?) -> EventLoopFuture<Void> {
         _send(event: event, payload: payload)
     }
     
