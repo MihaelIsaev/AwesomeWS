@@ -282,6 +282,10 @@ Original request gives you ability to e.g. determine connected user:
 let user = try client.originalRequest.requireAuthenticated(User.self)
 ```
 
+## How to implement automatic ping?
+
+Please take a look at [this gist example](https://gist.github.com/MihaelIsaev/d5b2fa4243627b51c625515eae4cc74a)
+
 ## How to connect from iOS, macOS, etc?
 
 You could use pure `URLSession` websockets functionality since iOS13, or for example you could use my [CodyFire lib](https://github.com/MihaelIsaev/CodyFire) or classic [Starscream lib](https://github.com/daltoniam/Starscream)
