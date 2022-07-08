@@ -1,31 +1,31 @@
 import Vapor
 
 extension Application {
-    /// Configure WS through this variable
+    /// Configure WebSocket through this variable
     ///
-    /// Declare WSID in extension
+    /// Declare WebSocketID in extension
     /// ```swift
-    /// extension WSID {
-    ///     static var my: WSID<YourWSObserverClass> { .init() }
+    /// extension WebSocketID {
+    ///     static var customObserver: WebSocketID<YourWSObserverClass> { .init() }
     /// }
     /// ```
     ///
     /// Configure endpoint and start it serving
     /// ```swift
-    /// app.ws.build(.my).at("ws").middlewares(...).serve()
-    /// app.ws.setDefault(.my)
+    /// app.webSocketConfigurator.build(.customObserver).at("ws").middlewares(...).serve()
+    /// app.webSocketConfigurator.setDefault(.customObserver)
     /// ```
     ///
     /// Use it later on `Request`
     /// ```swift
-    /// req.ws().send(...)
-    /// req.ws(.my).send(...)
+    /// req.webSocketObserver().send(...)
+    /// req.webSocketObserver(.customObserver).send(...)
     /// ```
     /// or `Application`
     /// ```swift
-    /// app.ws.observer().send(...)
-    /// app.ws.observer(.my).send(...)
+    /// app.webSocketConfigurator.observer().send(...)
+    /// app.webSocketConfigurator.observer(.customObserver).send(...)
     /// ```
     ///
-    public var ws: Configurator { .init(self) }
+    public var webSocketConfigurator: Configurator { .init(self) }
 }

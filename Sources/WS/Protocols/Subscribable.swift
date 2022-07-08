@@ -22,7 +22,7 @@ extension Subscribable {
     }
 }
 
-internal protocol _Subscribable: class, Subscribable {
+internal protocol _Subscribable: AnyObject, Subscribable {
     var eventLoop: EventLoop { get }
     var clients: [_AnyClient] { get }
 }

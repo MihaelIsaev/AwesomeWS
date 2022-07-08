@@ -15,9 +15,9 @@ public protocol Sendable {
     @discardableResult
     func send<C>(model: C, encoder: Encoder) -> EventLoopFuture<Void> where C: Encodable
     @discardableResult
-    func send<T: Codable>(event: EID<T>) -> EventLoopFuture<Void>
+    func send<T: Codable>(event: EventID<T>) -> EventLoopFuture<Void>
     @discardableResult
-    func send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void>
+    func send<T: Codable>(event: EventID<T>, payload: T?) -> EventLoopFuture<Void>
     @discardableResult
     func sendPing() -> EventLoopFuture<Void>
 }
@@ -109,11 +109,11 @@ extension _Sendable {
         }
     }
     
-    func _send<T: Codable>(event: EID<T>) -> EventLoopFuture<Void> {
+    func _send<T: Codable>(event: EventID<T>) -> EventLoopFuture<Void> {
         send(event: event, payload: nil)
     }
     
-    func _send<T: Codable>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> {
+    func _send<T: Codable>(event: EventID<T>, payload: T?) -> EventLoopFuture<Void> {
         send(model: Event(event: event.id, payload: payload))
     }
     
@@ -151,11 +151,11 @@ extension EventLoopFuture: Sendable where Value: Sendable {
         flatMap { $0.send(model: model, encoder: encoder) }
     }
     
-    public func send<T>(event: EID<T>) -> EventLoopFuture<Void> where T : Decodable, T : Encodable {
+    public func send<T>(event: EventID<T>) -> EventLoopFuture<Void> where T : Decodable, T : Encodable {
         flatMap { $0.send(event: event) }
     }
     
-    public func send<T>(event: EID<T>, payload: T?) -> EventLoopFuture<Void> where T : Decodable, T : Encodable {
+    public func send<T>(event: EventID<T>, payload: T?) -> EventLoopFuture<Void> where T : Decodable, T : Encodable {
         flatMap { $0.send(event: event, payload: payload) }
     }
     

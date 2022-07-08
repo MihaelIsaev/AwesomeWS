@@ -2,7 +2,7 @@ import Vapor
 
 public class EndpointBuilder<Observer: AnyObserver> {
     let application: Application
-    let wsid: WSID<Observer>
+    let wsid: WebSocketID<Observer>
     
     var path: [PathComponent] = []
     var middlewares: [Middleware] = []
@@ -10,7 +10,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
     var encoder: Encoder?
     var decoder: Decoder?
     
-    init (_ application: Application, _ wsid: WSID<Observer>) {
+    init (_ application: Application, _ wsid: WebSocketID<Observer>) {
         self.application = application
         self.wsid = wsid
     }
@@ -60,7 +60,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
     /// Starts websocket to listen on configured enpoint
     @discardableResult
     public func serve() -> Observer {
-        _ = application.ws.knownEventLoop
+        _ = application.webSocketConfigurator.knownEventLoop
         let observer = Observer.init(app: application, key: wsid.key, path: path.string, exchangeMode: exchangeMode)
         
         if let encoder = encoder {
@@ -70,7 +70,7 @@ public class EndpointBuilder<Observer: AnyObserver> {
             observer.decoder = decoder
         }
         
-        application.wsStorage[wsid.key] = observer
+        application.webSocketStorage[wsid.key] = observer
         WSRoute(root: application.grouped(middlewares), path: path).webSocket(onUpgrade: observer.handle)
         
         let observerType = String(describing: Observer.self)
