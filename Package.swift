@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.2
 
 import PackageDescription
 
@@ -13,7 +13,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
         //.package(url: "https://github.com/vapor/websocket-kit.git", from: "2.0.0")
-        .package(url: "https://github.com/vapor/websocket-kit.git", exact: "2.9.1")
+        .package(url: "https://github.com/vapor/websocket-kit.git", .exact("2.9.1"))
     ],
     targets: [
         .target(name: "WS", dependencies: [
