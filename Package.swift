@@ -1,18 +1,18 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.7
 
 import PackageDescription
 
 let package = Package(
     name: "AwesomeWS",
     platforms: [
-       .macOS(.v10_15)
+       .macOS(.v12)
     ],
     products: [
         .library(name: "WS", targets: ["WS"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-        .package(url: "https://github.com/vapor/websocket-kit.git", from: "2.0.0")
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.74.2"),
+        .package(url: "https://github.com/vapor/websocket-kit.git", from: "2.7.0"),
     ],
     targets: [
         .target(name: "WS", dependencies: [
